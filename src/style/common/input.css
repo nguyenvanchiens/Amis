@@ -1,0 +1,79 @@
+input{
+    color: #666666;
+}
+input:focus{
+    border: 1px solid #019160;
+}
+input::placeholder{
+    color: rgb(167, 167, 167);
+    font-style: italic;
+    font-size: 12px;
+}
+.m-content-input-search{
+    display: flex;
+    justify-items: center;
+    align-items: center;
+}
+.m-input-error{
+    border: 1px solid red !important;
+}
+.m-input-search{
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    padding-right: 25px;
+    border: 1px solid rgb(196, 193, 193);
+    height: 24px;
+    position: relative;
+}
+.m-input-search:focus{
+    border: 1px solid rgb(67, 141, 56);
+}
+.m-content-input-search i{
+    font-size: 16px;
+    padding-right: 5px;
+    color: #e0dbdb;
+    position: absolute;
+    right: 65px;
+}
+.m-input-focus{
+    border: 1px solid rgb(67, 141, 56);
+}
+.m-input{
+    height: 31px;
+    border: none;
+    outline: none;
+    border: 1px solid rgb(190, 190, 190);
+    padding-left: 10px;
+    margin-right: 10px;
+    border-radius: 3px;
+}
+.m-input-employeecode{
+    width: 150px;
+}
+.m-input-fullname{
+    width: 246px;
+}
+input[type="date"]{
+    height: 33px;
+    width: 160px;
+}
+input[type="radio"]{
+    transform: scale(1.5);
+}
+.m-input-card{
+    width: 200px;
+}
+.m-input-position,
+.w420{
+    width: 420px;
+}
+.m-input-issued-by{
+    width: 381px;
+}
+.m-input-address{
+    width: 840px;
+}
+.m-input-info{
+    width: 200px;
+}

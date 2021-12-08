@@ -1,0 +1,44 @@
+
+/*Code phần table*/
+.m-table{
+    overflow: scroll;
+    height: 545px;
+}
+table th{
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #fff;
+    text-transform: uppercase;
+}
+table th,td{
+    border-bottom: 1px solid rgb(199 199 199);
+    padding:10px 16px;
+    text-align: left;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;   
+}
+table th{
+    background-color: rgb(237, 238, 242);
+    border-left: 1px solid rgb(196, 196, 196);
+}
+table tr{
+    position: relative;
+}
+table td{
+    border-left:1px dashed rgb(196, 196, 196);
+}
+table td:nth-child(1),
+table th:nth-child(1){
+    border-left: unset;
+}
+
+tbody{
+    overflow: scroll;
+    overflow: hidden; 
+}
+.m-handle{
+    color: rgb(46, 123, 179);
+}
