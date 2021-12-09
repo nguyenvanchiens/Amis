@@ -76,15 +76,10 @@
         <div class="m-paging-center">
           <div class="scombobox">
             <input type="text" id="" class="s-combobox-input" />
-            <button class="s-combobox-buton">
-              <i class="fas fa-sort-down"></i>
-            </button>
-            <div class="s-combobox-data">
-              <div class="s-combobox-item" value="1">Hiện thị 10 trang</div>
-              <div class="s-combobox-item" value="0">Hiện thị 20 trang</div>
-              <div class="s-combobox-item" value="0">Hiện thị 30 trang</div>
-              <div class="s-combobox-item" value="0">Hiện thị 40 trang</div>
+            <div class="s-combobox-buton">
+              <i class="fas fa-sort-down t-2"></i>
             </div>
+            <div class="s-combobox-data"></div>
           </div>
           <button class="m-btn-paging m-btn-paging-First">Trước</button>
           <div class="m-paging-number">
@@ -107,6 +102,7 @@
       :employee="employee"
       :EmployeeId="EmployeeId"
       :text="EmployeeId == '' ? 'Cất và Thêm' : 'Update'"
+      :textNameValue="departmentName"
     />
     <!--Phần hiện thị msg delete-->
     <div class="message">
@@ -146,33 +142,24 @@ import $ from "jquery";
 
 export default {
   created() {
-    /**
-     * Load dữ liệu nhân viên
-     * Author: NVChien (07/12/2021)
-     */
-    axios
-      .get(`http://amis.manhnv.net/api/v1/Employees`)
-      .then((response) => {
-        this.employees = response.data;
-      })
-      .catch((e) => {
-        this.errors.push(e);
-      });
+    this.loadData();
   },
   data() {
     return {
       employees: [],
       isShow: false,
       EmployeeId: "",
+      departmentName: "",
       employee: {
         EmployeeCode: "NV-123123",
-        EmployeeName: "Nguyễn Văn A",
+        EmployeeName: "Nguyễn Văn K",
         Gender: "1",
-        DateOfBirth: "2021-12-07",
+        DateOfBirth: "2021-12-09",
         IdentityNumber: "1234321456",
         IdentityDate: "2021-12-07",
         IdentityPlace: "Hưng yên",
         Address: "Hưng yên",
+        PhoneNumber: "0986756432",
         TelephoneNumber: "0986756432",
         Email: "test@gmail.com",
         BankAccountNumber: "1968473212",
@@ -180,6 +167,7 @@ export default {
         BankBranchName: "Hưng Yên",
         PositionId: "",
         DepartmentId: "17120d02-6ab5-3e43-18cb-66948daf6128",
+        EmployeePosition: "Nhân viên",
       },
     };
   },
@@ -204,11 +192,31 @@ export default {
       this.isShow = !this.isShow;
     },
     /**
-     * Ẩn form chi tiết employee
+     * Ẩn form chi tiết employee và gán lại dữ liệu mặc định cho employee
      * Author: NVChien (07/12/2021)
      */
     hideForm() {
       this.EmployeeId = "";
+      this.departmentName = "";
+      this.employee = {
+        EmployeeCode: "NV-123123",
+        EmployeeName: "Nguyễn Văn A",
+        Gender: "1",
+        DateOfBirth: "2021-12-07",
+        IdentityNumber: "1234321456",
+        IdentityDate: "2021-12-07",
+        IdentityPlace: "Hưng yên",
+        Address: "Hưng yên",
+        PhoneNumber: "0986756432",
+        TelephoneNumber: "0986756432",
+        Email: "test@gmail.com",
+        BankAccountNumber: "1968473212",
+        BankName: "ACB",
+        BankBranchName: "Hưng Yên",
+        PositionId: "",
+        DepartmentId: "17120d02-6ab5-3e43-18cb-66948daf6128",
+        EmployeePosition: "Nhân viên",
+      };
       this.isShow = !this.isShow;
     },
     /**
@@ -216,21 +224,14 @@ export default {
      * Author:NVChien(7/12/2021)
      */
     refresh() {
-      axios
-        .get(`http://amis.manhnv.net/api/v1/Employees`)
-        .then((response) => {
-          setTimeout(() => {
-            $(".loading").css("display", "block");
-          }, 0);
-          setTimeout(() => {
-            $(".loading").css("display", "none");
-          }, 1000);
-          this.employees = response.data;
-          this.EmployeeId = "";
-        })
-        .catch((e) => {
-          this.errors.push(e);
-        });
+      this.EmployeeId = "";
+      this.loadData();
+      setTimeout(() => {
+        $(".loading").css("display", "block");
+      }, 0);
+      setTimeout(() => {
+        $(".loading").css("display", "none");
+      }, 1000);
     },
     /**
      * Thêm mới nhân viên
@@ -240,7 +241,7 @@ export default {
       axios
         .post("http://amis.manhnv.net/api/v1/Employees", employee)
         .then(() => {
-          this.isShow = !this.isShow;
+          this.hideForm();
           this.refresh();
         })
         .catch((error) => {
@@ -258,6 +259,8 @@ export default {
         .get(`http://amis.manhnv.net/api/v1/Employees/` + employeeid)
         .then((response) => {
           this.employee = response.data;
+          this.departmentName = "api không lấy được departname";
+          console.log(this.departmentName);
           if (response.data.DateOfBirth != "") {
             this.employee.DateOfBirth = this.ChangeDate(
               response.data.DateOfBirth
@@ -284,9 +287,8 @@ export default {
           employee
         )
         .then(() => {
-          console.log("update thành công");
           this.refresh();
-          this.isShow = !this.isShow;
+          this.hideForm();
         })
         .catch((e) => {
           console.log(e);
@@ -310,6 +312,20 @@ export default {
         reuslt = year + "-" + month + "-" + day;
       }
       return reuslt;
+    },
+    /**
+     * Load dữ liệu nhân viên
+     * Author: NVChien (07/12/2021)
+     */
+    loadData() {
+      axios
+        .get(`http://amis.manhnv.net/api/v1/Employees`)
+        .then((response) => {
+          this.employees = response.data;
+        })
+        .catch((e) => {
+          this.errors.push(e);
+        });
     },
   },
   filters: {

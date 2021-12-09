@@ -55,31 +55,11 @@
             <div class="form-group-row">
               <div class="form-group">
                 <label for="">Đơn vị <span>*</span></label>
-                <div class="scombobox">
-                  <input
-                    type="text"
-                    id=""
-                    class="s-combobox-input"
-                    v-model="employee.DepartmentId"
-                  />
-                  <button class="s-combobox-buton">
-                    <i class="fas fa-sort-down"></i>
-                  </button>
-                  <div class="s-combobox-data">
-                    <div class="s-combobox-item" value="1">
-                      Hiện thị 10 trang
-                    </div>
-                    <div class="s-combobox-item" value="0">
-                      Hiện thị 20 trang
-                    </div>
-                    <div class="s-combobox-item" value="0">
-                      Hiện thị 30 trang
-                    </div>
-                    <div class="s-combobox-item" value="0">
-                      Hiện thị 40 trang
-                    </div>
-                  </div>
-                </div>
+                <DropDown
+                  :options="Department"
+                  @select="selectOptionDepartment"
+                  :textNameValue="textNameValue"
+                />
               </div>
             </div>
             <div class="form-group-row">
@@ -88,27 +68,14 @@
                 <div class="scombobox">
                   <input
                     type="text"
-                    v-model="employee.PositionId"
+                    v-model="employee.EmployeePosition"
                     id=""
                     class="s-combobox-input"
                   />
-                  <button class="s-combobox-buton">
+                  <!-- <div class="s-combobox-buton">
                     <i class="fas fa-sort-down"></i>
-                  </button>
-                  <div class="s-combobox-data">
-                    <div class="s-combobox-item" value="1">
-                      Hiện thị 10 trang
-                    </div>
-                    <div class="s-combobox-item" value="0">
-                      Hiện thị 20 trang
-                    </div>
-                    <div class="s-combobox-item" value="0">
-                      Hiện thị 30 trang
-                    </div>
-                    <div class="s-combobox-item" value="0">
-                      Hiện thị 40 trang
-                    </div>
                   </div>
+                  <div class="s-combobox-data"></div> -->
                 </div>
               </div>
             </div>
@@ -297,30 +264,30 @@
   </div>
 </template>
 <script>
+import DropDown from "../../components/shared/DropDown.vue";
+import axios from "axios";
 export default {
   props: {
     isShow: Boolean,
     employee: Object,
     EmployeeId: String,
     text: String,
+    textNameValue: String,
   },
   created() {
-    // if (this.EmployeeId == "") {
-    //   axios
-    //     .get(`http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode`)
-    //     .then((response) => {
-    //       this.employee.EmployeeCode = response.data;
-    //       $("txtemployeecode").focus();
-    //     })
-    //     .catch((e) => {
-    //       this.errors.push(e);
-    //     });
-    // }
+    this.loadDepartment();
   },
   data() {
-    return {};
+    return {
+      value: "",
+      Department: [],
+    };
   },
   methods: {
+    /**
+     * Thêm mới hoặc sửa employee
+     * Author: NVChien (9/12/2021)
+     */
     onSubmit() {
       if (this.EmployeeId != "") {
         this.$emit("update-employee", this.employee);
@@ -328,6 +295,31 @@ export default {
         this.$emit("add-employee", this.employee);
       }
     },
+    /**
+     * Lấy ra danh sách deparment để laod cbb
+     * Author: NVChien (9/12/2021)
+     */
+    loadDepartment() {
+      axios
+        .get(`http://amis.manhnv.net/api/v1/Departments`)
+        .then((res) => {
+          this.Department = res.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    /**
+     * Lấy ra value khi mà mình chọn cbb
+     * Author: NVChien (9/12/2021)
+     */
+    selectOptionDepartment(option) {
+      this.textNameValue = option.DepartmentName;
+      this.employee.DepartmentId = option.DepartmentId;
+    },
+  },
+  components: {
+    DropDown,
   },
 };
 </script>

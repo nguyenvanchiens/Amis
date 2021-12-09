@@ -1,27 +1,26 @@
 <template>
   <div class="m-container-fuild">
-    <TheNavbar/>
+    <TheNavbar />
     <div class="m-container">
-      <TheHeader/>
+      <TheHeader />
       <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
-
-import TheNavbar from './components/layout/TheNavbar.vue'
-import TheHeader from './components/layout/TheHeader.vue'
+import TheNavbar from "./components/layout/TheNavbar.vue";
+import TheHeader from "./components/layout/TheHeader.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     TheNavbar,
-    TheHeader
-  }
-}
+    TheHeader,
+  },
+};
 </script>
 
 <style>
-  @import url('./style/shared/main.css');
+@import url("./style/shared/main.css");
 </style>
