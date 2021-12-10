@@ -11,22 +11,31 @@
 @import url(../shared/header.css);
 @import url(../shared/modal.css);
 
-body{
-    margin: 0;
-    font-family: Notosans-Regular;
-    font-size:13px;
-    box-sizing: border-box;
+body {
+  margin: 0;
+  font-family: Notosans-Regular;
+  font-size: 13px;
+  box-sizing: border-box;
 }
 @font-face {
-    font-family: 'Notosans-Bold';
-    src: url(../../assets/fonts/notosans-bold.3ede5aff.woff2);
+  font-family: "Notosans-Bold";
+  src: url(../../assets/fonts/notosans-bold.3ede5aff.woff2);
 }
 @font-face {
-    font-family: 'Notosans-Italic';
-    src: url(../../assets/fonts/notosans-italic.1c1aaac9.woff2);
+  font-family: "Notosans-Italic";
+  src: url(../../assets/fonts/notosans-italic.1c1aaac9.woff2);
 }
 @font-face {
-    font-family: 'Notosans-Semibold';
-    src: url(../../assets/fonts/notosans-semibold.df3e6dc4.woff2);
+  font-family: "Notosans-Semibold";
+  src: url(../../assets/fonts/notosans-semibold.df3e6dc4.woff2);
 }
 
+input[type="radio" i] {
+  background-color: green !important;
+  cursor: default;
+  appearance: auto;
+  box-sizing: border-box;
+  margin: 3px 3px 0px 5px;
+  padding: initial;
+  border: initial;
+}

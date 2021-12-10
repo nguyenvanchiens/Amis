@@ -4,8 +4,8 @@
       type="text"
       id=""
       class="s-combobox-input"
-      :text="textNameValue"
-      v-model="textNameValue"
+      :text="value"
+      v-model="value"
     />
     <div @click="showData" class="s-combobox-buton">
       <i class="fas fa-sort-down"></i>
@@ -27,7 +27,7 @@
 export default {
   props: {
     options: Array,
-    textNameValue: String,
+    value: String,
   },
   data() {
     return {

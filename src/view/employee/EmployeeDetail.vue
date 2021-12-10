@@ -22,7 +22,7 @@
           <button class="m-btn-question">
             <i class="far fa-question-circle"></i>
           </button>
-          <button @click="$emit('hide-form')" class="m-btn-close">
+          <button @click="hideForm" class="m-btn-close">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -58,7 +58,7 @@
                 <DropDown
                   :options="Department"
                   @select="selectOptionDepartment"
-                  :textNameValue="textNameValue"
+                  :value="value"
                 />
               </div>
             </div>
@@ -247,12 +247,16 @@
         </div>
         <div class="m-dialog-footer">
           <div>
-            <button @click="$emit('hide-form')" class="m-form-btn m-btn-close">
+            <button
+              type="button"
+              @click="hideForm"
+              class="m-form-btn m-btn-close"
+            >
               Hủy
             </button>
           </div>
           <div>
-            <button class="m-form-btn">Cất</button>
+            <button type="button" class="m-form-btn">Cất</button>
             <button type="submit" class="m-form-btn m-btn-save">
               {{ text }}
             </button>
@@ -272,7 +276,6 @@ export default {
     employee: Object,
     EmployeeId: String,
     text: String,
-    textNameValue: String,
   },
   created() {
     this.loadDepartment();
@@ -314,8 +317,16 @@ export default {
      * Author: NVChien (9/12/2021)
      */
     selectOptionDepartment(option) {
-      this.textNameValue = option.DepartmentName;
+      this.value = option.DepartmentName;
       this.employee.DepartmentId = option.DepartmentId;
+    },
+    /**
+     *Ẩn form
+     * Author: NVChien(9/12/2021)
+     */
+    hideForm() {
+      this.value = "";
+      this.$emit("hide-form");
     },
   },
   components: {

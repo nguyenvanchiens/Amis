@@ -53,14 +53,22 @@
               <td>{{ employee.BankBranchName }}</td>
               <td>
                 <button @click="showFormEdit(employee.EmployeeId)">Sửa</button>
-
-                <button class="m-btn-icon down-data-row">
+                <button
+                  @click="showListRowTable(employee.EmployeeId)"
+                  class="m-btn-icon down-data-row"
+                >
                   <i class="fas fa-sort-down"></i>
                 </button>
-                <div class="data-list-row">
+                <div class="data-list-row" :id="employee.EmployeeId">
                   <div class="data-items">
                     <div class="data-item">Nhân bản</div>
-                    <div class="data-item" id="btn-delete-row">Xóa</div>
+                    <div
+                      @click="showFomrDel(employee.EmployeeId)"
+                      class="data-item"
+                      id="btn-delete-row"
+                    >
+                      Xóa
+                    </div>
                     <div class="data-item">Ngừng</div>
                   </div>
                 </div>
@@ -95,17 +103,16 @@
     </div>
 
     <EmployeeDetail
-      v-show="isShow"
+      v-show="isShowForm"
       @hide-form="hideForm"
       @add-employee="AddEmployee"
       @update-employee="UpdateEmployee"
       :employee="employee"
       :EmployeeId="EmployeeId"
       :text="EmployeeId == '' ? 'Cất và Thêm' : 'Update'"
-      :textNameValue="departmentName"
     />
     <!--Phần hiện thị msg delete-->
-    <div class="message">
+    <div class="message" v-show="isShowFormDel">
       <div class="message-content">
         <div class="message-header">
           <div class="header-warning">
@@ -114,14 +121,20 @@
           <div class="header-text">
             <span
               >Bạn có thực sự muốn xóa Nhân viên
-              <span class="">nv09123123</span>hay không hả bạn</span
+              <b class="employeeCode_text"></b> hay không hả bạn</span
             >
           </div>
         </div>
         <div class="messgae-footer">
           <div class="btn-group">
-            <button class="m-btn-default btn-close-delete">Không</button>
-            <button class="btn-delete">Có</button>
+            <button
+              type="button"
+              @click="hideFomrDel"
+              class="m-btn-default btn-close-delete"
+            >
+              Không
+            </button>
+            <button @click="Delete" class="btn-delete">Có</button>
           </div>
         </div>
       </div>
@@ -147,9 +160,9 @@ export default {
   data() {
     return {
       employees: [],
-      isShow: false,
+      isShowForm: false,
+      isShowFormDel: false,
       EmployeeId: "",
-      departmentName: "",
       employee: {
         EmployeeCode: "NV-123123",
         EmployeeName: "Nguyễn Văn K",
@@ -189,7 +202,7 @@ export default {
             this.errors.push(e);
           });
       }
-      this.isShow = !this.isShow;
+      this.isShowForm = !this.isShowForm;
     },
     /**
      * Ẩn form chi tiết employee và gán lại dữ liệu mặc định cho employee
@@ -197,7 +210,6 @@ export default {
      */
     hideForm() {
       this.EmployeeId = "";
-      this.departmentName = "";
       this.employee = {
         EmployeeCode: "NV-123123",
         EmployeeName: "Nguyễn Văn A",
@@ -217,7 +229,7 @@ export default {
         DepartmentId: "17120d02-6ab5-3e43-18cb-66948daf6128",
         EmployeePosition: "Nhân viên",
       };
-      this.isShow = !this.isShow;
+      this.isShowForm = !this.isShowForm;
     },
     /**
      * Làm mới lại trang
@@ -254,13 +266,11 @@ export default {
      */
     showFormEdit(employeeid) {
       this.EmployeeId = employeeid;
-      this.isShow = !this.isShow;
+      this.isShowForm = !this.isShowForm;
       axios
         .get(`http://amis.manhnv.net/api/v1/Employees/` + employeeid)
         .then((response) => {
           this.employee = response.data;
-          this.departmentName = "api không lấy được departname";
-          console.log(this.departmentName);
           if (response.data.DateOfBirth != "") {
             this.employee.DateOfBirth = this.ChangeDate(
               response.data.DateOfBirth
@@ -325,6 +335,59 @@ export default {
         })
         .catch((e) => {
           this.errors.push(e);
+        });
+    },
+    /**
+     * Hiện chức năng xóa nhân bản cho từng table
+     * Author: NVChien (07/12/2021)
+     */
+    showListRowTable(EmployeeId) {
+      setTimeout(() => {
+        $(`#${EmployeeId}`).show();
+      }, 0);
+      setTimeout(() => {
+        $(`#${EmployeeId}`).hide();
+      }, 2000);
+    },
+    /**
+     * hiện form xóa
+     * Author: NVChien(10/12/2021)
+     */
+    showFomrDel(emplyeeid) {
+      this.EmployeeId = emplyeeid;
+      this.isShowFormDel = !this.isShowFormDel;
+      axios
+        .get(`http://amis.manhnv.net/api/v1/Employees/` + emplyeeid)
+        .then((res) => {
+          $(".employeeCode_text").text(`(${res.data.EmployeeCode})`);
+          $(`#${emplyeeid}`).hide();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    /**
+     * Ẩn form xóa
+     * Author: NVChien(10/12/2021)
+     */
+    hideFomrDel() {
+      this.EmployeeId = "";
+      this.isShowFormDel = !this.isShowFormDel;
+    },
+    /**
+     * Xóa nhân viên
+     * Author: NvChien(12/10/2021)
+     */
+    Delete() {
+      axios
+        .delete("http://amis.manhnv.net/api/v1/Employees/" + this.EmployeeId)
+        .then(() => {
+          console.log("xóa thành công");
+          this.hideFomrDel();
+          this.refresh();
+        })
+        .catch((e) => {
+          console.log(e);
         });
     },
   },
