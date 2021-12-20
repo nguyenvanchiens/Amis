@@ -89,16 +89,24 @@
       </div>
       <div class="m-navigation">
         <div class="m-paging-left">
-          <div class="m-paging-text-left">Tổng số: <b>1035</b> bản ghi</div>
+          <div class="m-paging-text-left">
+            Tổng số: <b>{{ TotalRecord }}</b> bản ghi
+          </div>
         </div>
         <div class="m-paging-center">
-          <div class="scombobox">
-            <input type="text" id="" class="s-combobox-input" />
-            <div class="s-combobox-buton">
-              <i class="fas fa-sort-down t-2"></i>
-            </div>
-            <div class="s-combobox-data"></div>
-          </div>
+          <!--Combobox Phân trang-->
+          <ComboboxPanigation
+            style="margin-right: 10px"
+            :ListItem="[
+              '10 bản ghi trên trang',
+              '20 bản ghi trên trang',
+              '30 bản ghi trên trang',
+              '50 bản ghi trên trang',
+              '100 bản ghi trên trang',
+            ]"
+            v-if="true"
+            @handleSelect="changeRecordNumber"
+          />
           <button class="m-btn-paging m-btn-paging-First">Trước</button>
           <div class="m-paging-number">
             <div class="m-page-item">1</div>
@@ -162,15 +170,22 @@
 </template>
 
 <script>
+import axios from "axios";
+import $ from "jquery";
 import EmployeeDetail from "./EmployeeDetail.vue";
 import Loading from "../../components/shared/Loading.vue";
 import ToastMessage from "../../components/shared/ToastMessage.vue";
-import axios from "axios";
-import $ from "jquery";
+import ComboboxPanigation from "../../components/shared/ComboboxPanigation.vue";
 
 export default {
   created() {
     this.loadData();
+  },
+  components: {
+    EmployeeDetail,
+    Loading,
+    ToastMessage,
+    ComboboxPanigation,
   },
   data() {
     return {
@@ -182,6 +197,7 @@ export default {
       isShowToast: false,
       toastText: "",
       toastColor: "",
+      TotalRecord: 0,
       employee: {
         EmployeeCode: "NV-123123",
         EmployeeName: "Nguyễn Văn K",
@@ -201,6 +217,13 @@ export default {
         DepartmentId: "17120d02-6ab5-3e43-18cb-66948daf6128",
         EmployeePosition: "Nhân viên",
       },
+      searchText: "",
+      // số bản ghi trên một trang
+      pageSize: 10,
+      // trang hiện tại
+      pageNumber: 1,
+      // tổng số trang
+      totalPages: 0,
     };
   },
   methods: {
@@ -354,9 +377,13 @@ export default {
      */
     loadData() {
       axios
-        .get(`http://amis.manhnv.net/api/v1/Employees`)
+        .get(
+          `http://amis.manhnv.net/api/v1/Employees/filter?pageSize=${this.pageSize}&pageNumber=${this.pageNumber}&employeeFilter=${this.searchText}`
+        )
         .then((response) => {
-          this.employees = response.data;
+          this.employees = response.data.Data;
+          this.TotalRecord = response.data.TotalRecord;
+          console.log(response.data.Data);
         })
         .catch((e) => {
           this.errors.push(e);
@@ -423,6 +450,14 @@ export default {
         this.isShowToast = false;
       }, 3000);
     },
+    /**
+     * Số lượng bản ghi trên một trang
+     * CreatedBy: NVChien (18/12/2021)
+     */
+    changeRecordNumber(pageRecord) {
+      this.pageSize = pageRecord;
+      this.loadData();
+    },
   },
   filters: {
     formatGender(val) {
@@ -455,11 +490,6 @@ export default {
       }
       return result;
     },
-  },
-  components: {
-    EmployeeDetail,
-    Loading,
-    ToastMessage,
   },
 };
 </script>

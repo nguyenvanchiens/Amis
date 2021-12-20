@@ -1,7 +1,7 @@
 <template>
   <div class="m-header-top">
     <div class="m-header-top-left">
-      <div class="m-icon m-icon-burger icon-24"></div>
+      <div class="m-icon m-icon-burger icon-28"></div>
       <div class="m-header-top-company">
         <select name="" id="">
           <option value="">
