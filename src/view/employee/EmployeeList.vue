@@ -24,27 +24,37 @@
         <table border="0" style="width: 100%" cellspacing="0" cellpadding="">
           <thead>
             <tr>
-              <th><input type="checkbox" name="" id="" /></th>
-              <th>Mã nhân viên</th>
-              <th>Tên nhân viên</th>
-              <th>Giới tính</th>
-              <th>Ngày sinh</th>
-              <th>Số Cmnd</th>
-              <th>Chức danh</th>
-              <th>Tên đơn vị</th>
-              <th>số tài khoản</th>
-              <th>Tên ngân hàng</th>
-              <th>chi nhánh tk ngân hàng</th>
-              <th>chức năng</th>
+              <th class="text-align-left"><input type="checkbox" /></th>
+              <th class="text-align-left w100">Mã nhân viên</th>
+              <th class="text-align-left w200">Tên nhân viên</th>
+              <th class="text-align-left w100">Giới tính</th>
+              <th class="m-text-center w100">Ngày sinh</th>
+              <th class="text-align-left w100">Số CMND</th>
+              <th class="text-align-left w100">Chức danh</th>
+              <th class="text-align-left" style="min-width: 100px">
+                Tên đơn vị
+              </th>
+              <th class="text-align-left w100">Số tài khoản</th>
+              <th class="text-align-left w150">Tên ngân hàng</th>
+              <th class="text-align-left w150">Chi nhánh TK ngân hàng</th>
+              <th class="text-align-right" style="padding-right: 12px">
+                Chức năng
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="employee in employees" :key="employee.EmployeeId">
+            <tr
+              @dblclick="showFormEdit(employee.EmployeeId)"
+              v-for="employee in employees"
+              :key="employee.EmployeeId"
+            >
               <td><input type="checkbox" name="" id="" /></td>
               <td>{{ employee.EmployeeCode }}</td>
               <td>{{ employee.EmployeeName }}</td>
               <td>{{ employee.Gender | formatGender }}</td>
-              <td>{{ employee.DateOfBirth | formatDate }}</td>
+              <td class="m-text-center">
+                {{ employee.DateOfBirth | formatDate }}
+              </td>
               <td>{{ employee.IdentityNumber }}</td>
               <td>{{ employee.EmployeePosition }}</td>
               <td>{{ employee.DepartmentName }}</td>
@@ -63,7 +73,7 @@
                   <div class="data-items">
                     <div class="data-item">Nhân bản</div>
                     <div
-                      @click="showFomrDel(employee.EmployeeId)"
+                      @click="showFomrDel(employee)"
                       class="data-item"
                       id="btn-delete-row"
                     >
@@ -141,15 +151,20 @@
       <div class="dialog-background"></div>
     </div>
     <!-- Phần loading -->
-    <div class="loading">
-      <div class="loading-icon"></div>
-      <div class="dialog-background"></div>
-    </div>
+    <Loading :isLoading="isLoading" />
+    <!--Toast Message-->
+    <ToastMessage
+      :isShowToast="isShowToast"
+      :toastText="toastText"
+      :toastColor="toastColor"
+    />
   </div>
 </template>
 
 <script>
 import EmployeeDetail from "./EmployeeDetail.vue";
+import Loading from "../../components/shared/Loading.vue";
+import ToastMessage from "../../components/shared/ToastMessage.vue";
 import axios from "axios";
 import $ from "jquery";
 
@@ -161,8 +176,12 @@ export default {
     return {
       employees: [],
       isShowForm: false,
+      isLoading: false,
       isShowFormDel: false,
       EmployeeId: "",
+      isShowToast: false,
+      toastText: "",
+      toastColor: "",
       employee: {
         EmployeeCode: "NV-123123",
         EmployeeName: "Nguyễn Văn K",
@@ -239,10 +258,10 @@ export default {
       this.EmployeeId = "";
       this.loadData();
       setTimeout(() => {
-        $(".loading").css("display", "block");
+        this.isLoading = true;
       }, 0);
       setTimeout(() => {
-        $(".loading").css("display", "none");
+        this.isLoading = false;
       }, 1000);
     },
     /**
@@ -254,6 +273,9 @@ export default {
         .post("http://amis.manhnv.net/api/v1/Employees", employee)
         .then(() => {
           this.hideForm();
+          this.showToastMessage();
+          this.toastText = "Thêm mới thành công";
+          this.toastColor = "#2e6da4";
           this.refresh();
         })
         .catch((error) => {
@@ -298,6 +320,9 @@ export default {
         )
         .then(() => {
           this.refresh();
+          this.showToastMessage();
+          this.toastText = "Update thành công";
+          this.toastColor = "#01b075";
           this.hideForm();
         })
         .catch((e) => {
@@ -353,18 +378,11 @@ export default {
      * hiện form xóa
      * Author: NVChien(10/12/2021)
      */
-    showFomrDel(emplyeeid) {
-      this.EmployeeId = emplyeeid;
+    showFomrDel(emplyee) {
+      this.EmployeeId = emplyee.EmployeeId;
       this.isShowFormDel = !this.isShowFormDel;
-      axios
-        .get(`http://amis.manhnv.net/api/v1/Employees/` + emplyeeid)
-        .then((res) => {
-          $(".employeeCode_text").text(`(${res.data.EmployeeCode})`);
-          $(`#${emplyeeid}`).hide();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      $(".employeeCode_text").text(`(${emplyee.EmployeeCode})`);
+      $(`#${emplyee.EmployeeId}`).hide();
     },
     /**
      * Ẩn form xóa
@@ -384,11 +402,26 @@ export default {
         .then(() => {
           console.log("xóa thành công");
           this.hideFomrDel();
+          this.showToastMessage();
+          this.toastText = "Xóa thành công";
+          this.toastColor = "#d43f3a";
           this.refresh();
         })
         .catch((e) => {
           console.log(e);
         });
+    },
+    /**
+     * Hiển thị toast message
+     * CreatedBy: NVChien (15/12/2021)
+     */
+    showToastMessage() {
+      setTimeout(() => {
+        this.isShowToast = true;
+      }, 1000);
+      setTimeout(() => {
+        this.isShowToast = false;
+      }, 3000);
     },
   },
   filters: {
@@ -425,6 +458,8 @@ export default {
   },
   components: {
     EmployeeDetail,
+    Loading,
+    ToastMessage,
   },
 };
 </script>

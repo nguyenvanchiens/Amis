@@ -104,7 +104,7 @@
                       name="gender"
                       id="rdgenderFale"
                     />
-                    Nam
+                    <label for="">Nam</label>
                   </div>
                   <div class="group-radio-item">
                     <input
@@ -115,7 +115,7 @@
                       name="gender"
                       id="rdgenderMale"
                     />
-                    Nữ
+                    <label for="">Nữ</label>
                   </div>
                   <div class="group-radio-item">
                     <input
@@ -126,7 +126,7 @@
                       name="gender"
                       id="rdgendercc"
                     />
-                    Khác
+                    <label for="">Khác</label>
                   </div>
                 </div>
               </div>
