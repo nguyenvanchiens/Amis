@@ -11,6 +11,7 @@
         <div class="m-content-input-search">
           <input
             type="text"
+            v-model="searchText"
             class="m-input-search"
             placeholder="Tìm kiếm theo mã hoặc tên"
           />
@@ -34,9 +35,9 @@
               <th class="text-align-left" style="min-width: 100px">
                 Tên đơn vị
               </th>
-              <th class="text-align-left w100">Số tài khoản</th>
-              <th class="text-align-left w150">Tên ngân hàng</th>
-              <th class="text-align-left w150">Chi nhánh TK ngân hàng</th>
+              <th class="text-align-left w10">Số tài khoản</th>
+              <th class="text-align-left w100">Tên ngân hàng</th>
+              <th class="text-align-left w200">Chi nhánh TK ngân hàng</th>
               <th class="text-align-right" style="padding-right: 12px">
                 Chức năng
               </th>
@@ -44,32 +45,32 @@
           </thead>
           <tbody>
             <tr
-              @dblclick="showFormEdit(employee.EmployeeId)"
+              @dblclick="showFormEdit(employee.employeeId)"
               v-for="employee in employees"
               :key="employee.EmployeeId"
             >
               <td><input type="checkbox" name="" id="" /></td>
-              <td>{{ employee.EmployeeCode }}</td>
-              <td>{{ employee.EmployeeName }}</td>
-              <td>{{ employee.Gender | formatGender }}</td>
+              <td>{{ employee.employeeCode }}</td>
+              <td>{{ employee.employeeName }}</td>
+              <td>{{ employee.gender | formatGender }}</td>
               <td class="m-text-center">
-                {{ employee.DateOfBirth | formatDate }}
+                {{ employee.dateOfBirth | formatDate }}
               </td>
-              <td>{{ employee.IdentityNumber }}</td>
-              <td>{{ employee.EmployeePosition }}</td>
-              <td>{{ employee.DepartmentName }}</td>
-              <td>{{ employee.BankAccountNumber }}</td>
-              <td>{{ employee.BankName }}</td>
-              <td>{{ employee.BankBranchName }}</td>
+              <td>{{ employee.identityNumber }}</td>
+              <td>{{ employee.employeePosition }}</td>
+              <td>{{ employee.departmentName }}</td>
+              <td>{{ employee.bankAccountNumber }}</td>
+              <td>{{ employee.bankName }}</td>
+              <td>{{ employee.bankBranchName }}</td>
               <td>
-                <button @click="showFormEdit(employee.EmployeeId)">Sửa</button>
+                <button @click="showFormEdit(employee.employeeId)">Sửa</button>
                 <button
-                  @click="showListRowTable(employee.EmployeeId)"
+                  @click="showListRowTable(employee.employeeId)"
                   class="m-btn-icon down-data-row"
                 >
                   <i class="fas fa-sort-down"></i>
                 </button>
-                <div class="data-list-row" :id="employee.EmployeeId">
+                <div class="data-list-row" :id="employee.employeeId">
                   <div class="data-items">
                     <div class="data-item">Nhân bản</div>
                     <div
@@ -107,15 +108,10 @@
             v-if="true"
             @handleSelect="changeRecordNumber"
           />
-          <button class="m-btn-paging m-btn-paging-First">Trước</button>
-          <div class="m-paging-number">
-            <div class="m-page-item">1</div>
-            <div class="m-page-item">2</div>
-            <div class="m-page-item">3</div>
-            <div class="m-page-item">...</div>
-            <div class="m-page-item">6</div>
-          </div>
-          <button class="m-btn-paging m-btn-paging-Next">Sau</button>
+          <PaginationPage
+            :totalPages="totalPages"
+            @changePage="changePageNumber"
+          />
         </div>
       </div>
     </div>
@@ -175,6 +171,7 @@ import $ from "jquery";
 import EmployeeDetail from "./EmployeeDetail.vue";
 import Loading from "../../components/shared/Loading.vue";
 import ToastMessage from "../../components/shared/ToastMessage.vue";
+import PaginationPage from "../../components/shared/PaginationPage.vue";
 import ComboboxPanigation from "../../components/shared/ComboboxPanigation.vue";
 
 export default {
@@ -186,6 +183,7 @@ export default {
     Loading,
     ToastMessage,
     ComboboxPanigation,
+    PaginationPage,
   },
   data() {
     return {
@@ -199,29 +197,30 @@ export default {
       toastColor: "",
       TotalRecord: 0,
       employee: {
-        EmployeeCode: "NV-123123",
-        EmployeeName: "Nguyễn Văn K",
-        Gender: "1",
-        DateOfBirth: "2021-12-09",
-        IdentityNumber: "1234321456",
-        IdentityDate: "2021-12-07",
-        IdentityPlace: "Hưng yên",
-        Address: "Hưng yên",
-        PhoneNumber: "0986756432",
-        TelephoneNumber: "0986756432",
-        Email: "test@gmail.com",
-        BankAccountNumber: "1968473212",
-        BankName: "ACB",
-        BankBranchName: "Hưng Yên",
-        PositionId: "",
-        DepartmentId: "17120d02-6ab5-3e43-18cb-66948daf6128",
-        EmployeePosition: "Nhân viên",
+        employeeCode: "NV-123123",
+        employeeName: "Nguyễn Văn K",
+        gender: "1",
+        dateOfBirth: "2021-12-09",
+        identityNumber: "1234321456",
+        identityDate: "2021-12-07",
+        odentityPlace: "Hưng yên",
+        address: "Hưng yên",
+        phoneNumber: "0986756432",
+        telephoneNumber: "0986756432",
+        email: "test@gmail.com",
+        bankAccountNumber: "1968473212",
+        bankName: "ACB",
+        bankBranchName: "Hưng Yên",
+        positionId: "",
+        departmentId: "17120d02-6ab5-3e43-18cb-66948daf6128",
+        employeePosition: "Nhân viên",
       },
       searchText: "",
       // số bản ghi trên một trang
       pageSize: 10,
       // trang hiện tại
-      pageNumber: 1,
+      // pageNumber: 1,
+      pageIndex: 1,
       // tổng số trang
       totalPages: 0,
     };
@@ -313,17 +312,18 @@ export default {
       this.EmployeeId = employeeid;
       this.isShowForm = !this.isShowForm;
       axios
-        .get(`http://amis.manhnv.net/api/v1/Employees/` + employeeid)
+        .get(`https://localhost:44320/api/v1/Employees/` + employeeid)
         .then((response) => {
           this.employee = response.data;
-          if (response.data.DateOfBirth != "") {
-            this.employee.DateOfBirth = this.ChangeDate(
-              response.data.DateOfBirth
+          this.employee.departmentName = response.data.departmentName;
+          if (response.data.dateOfBirth != "") {
+            this.employee.dateOfBirth = this.ChangeDate(
+              response.data.dateOfBirth
             );
           }
-          if (response.data.IdentityDate != "") {
-            this.employee.IdentityDate = this.ChangeDate(
-              response.data.IdentityDate
+          if (response.data.identityDate != "") {
+            this.employee.identityDate = this.ChangeDate(
+              response.data.identityDate
             );
           }
         })
@@ -338,7 +338,7 @@ export default {
     UpdateEmployee(employee) {
       axios
         .put(
-          `http://amis.manhnv.net/api/v1/Employees/` + this.EmployeeId,
+          `https://localhost:44320/api/v1/Employees/` + this.EmployeeId,
           employee
         )
         .then(() => {
@@ -349,8 +349,16 @@ export default {
           this.hideForm();
         })
         .catch((e) => {
-          console.log(e);
+          console.log(e.response.data);
         });
+    },
+    /**
+     * Chuyển trang
+     * CreatedBy: NVChien (20/12/2021)
+     */
+    changePageNumber(pageIndex) {
+      this.pageIndex = pageIndex;
+      this.loadData();
     },
     /**
      * Chuyển đổi date
@@ -378,12 +386,12 @@ export default {
     loadData() {
       axios
         .get(
-          `http://amis.manhnv.net/api/v1/Employees/filter?pageSize=${this.pageSize}&pageNumber=${this.pageNumber}&employeeFilter=${this.searchText}`
+          `https://localhost:44320/api/v1/Employees/GetAllPaging?pageSize=${this.pageSize}&pageIndex=${this.pageIndex}&entityFilter=${this.searchText}`
         )
         .then((response) => {
-          this.employees = response.data.Data;
-          this.TotalRecord = response.data.TotalRecord;
-          console.log(response.data.Data);
+          this.employees = response.data.data;
+          this.totalPages = response.data.totalPage;
+          this.TotalRecord = response.data.totalRecord;
         })
         .catch((e) => {
           this.errors.push(e);
@@ -406,10 +414,10 @@ export default {
      * Author: NVChien(10/12/2021)
      */
     showFomrDel(emplyee) {
-      this.EmployeeId = emplyee.EmployeeId;
+      this.EmployeeId = emplyee.employeeId;
       this.isShowFormDel = !this.isShowFormDel;
-      $(".employeeCode_text").text(`(${emplyee.EmployeeCode})`);
-      $(`#${emplyee.EmployeeId}`).hide();
+      $(".employeeCode_text").text(`(${emplyee.employeeCode})`);
+      $(`#${emplyee.employeeId}`).hide();
     },
     /**
      * Ẩn form xóa
@@ -425,7 +433,7 @@ export default {
      */
     Delete() {
       axios
-        .delete("http://amis.manhnv.net/api/v1/Employees/" + this.EmployeeId)
+        .delete("https://localhost:44320/api/v1/Employees/" + this.EmployeeId)
         .then(() => {
           console.log("xóa thành công");
           this.hideFomrDel();
@@ -456,6 +464,15 @@ export default {
      */
     changeRecordNumber(pageRecord) {
       this.pageSize = pageRecord;
+      this.loadData();
+    },
+  },
+  watch: {
+    /**
+     * Tìm kiếm dữ liệu
+     * CreatedBy: NVChien (18/12/2021)
+     */
+    searchText: function () {
       this.loadData();
     },
   },

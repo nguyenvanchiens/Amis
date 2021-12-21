@@ -34,7 +34,7 @@
               <div class="form-group">
                 <label for="">Mã <span>*</span></label>
                 <input
-                  v-model="employee.EmployeeCode"
+                  v-model="employee.employeeCode"
                   type="text"
                   class="m-input m-input-employeecode"
                   name=""
@@ -44,7 +44,7 @@
               <div class="form-group">
                 <label for="">Tên <span>*</span></label>
                 <input
-                  v-model="employee.EmployeeName"
+                  v-model="employee.employeeName"
                   type="text"
                   class="m-input m-input-fullname"
                   name=""
@@ -58,7 +58,7 @@
                 <DropDown
                   :options="Department"
                   @select="selectOptionDepartment"
-                  :value="value"
+                  :value="employee.departmentName"
                 />
               </div>
             </div>
@@ -68,7 +68,7 @@
                 <div class="scombobox">
                   <input
                     type="text"
-                    v-model="employee.EmployeePosition"
+                    v-model="employee.employeePosition"
                     id=""
                     class="s-combobox-input"
                   />
@@ -86,7 +86,7 @@
                 <label for="">Ngày sinh <span>*</span></label>
                 <input
                   type="date"
-                  v-model="employee.DateOfBirth"
+                  v-model="employee.dateOfBirth"
                   class="m-input m-input-dateofbirth"
                   name=""
                   id="dtdateofbirth"
@@ -97,7 +97,7 @@
                 <div class="group-radio">
                   <div class="group-radio-item">
                     <input
-                      v-model="employee.Gender"
+                      v-model="employee.gender"
                       type="radio"
                       class=""
                       value="1"
@@ -108,7 +108,7 @@
                   </div>
                   <div class="group-radio-item">
                     <input
-                      v-model="employee.Gender"
+                      v-model="employee.gender"
                       type="radio"
                       class=""
                       value="0"
@@ -119,7 +119,7 @@
                   </div>
                   <div class="group-radio-item">
                     <input
-                      v-model="employee.Gender"
+                      v-model="employee.gender"
                       type="radio"
                       class=""
                       value="2"
@@ -136,7 +136,7 @@
                 <label for="">Số chứng minh thư nhân dân</label>
                 <input
                   type="text"
-                  v-model="employee.IdentityNumber"
+                  v-model="employee.identityNumber"
                   class="m-input m-input-card"
                   name=""
                   id="dtdateofbirth"
@@ -146,7 +146,7 @@
                 <label for="">Ngày cấp</label>
                 <input
                   type="date"
-                  v-model="employee.IdentityDate"
+                  v-model="employee.identityDate"
                   class="m-input m-input-dateofbirth"
                   name=""
                   id="dtdateofbirth"
@@ -158,7 +158,7 @@
                 <label for="">Nơi cấp</label>
                 <input
                   type="text"
-                  v-model="employee.IdentityPlace"
+                  v-model="employee.identityPlace"
                   class="m-input m-input-issued-by"
                   name=""
                   id="txtfullname"
@@ -173,7 +173,7 @@
               <label for="">Địa chỉ</label>
               <input
                 type="text"
-                v-model="employee.Address"
+                v-model="employee.address"
                 class="m-input m-input-address"
                 name=""
                 id="txtfullname"
@@ -185,7 +185,7 @@
               <label for="">Đt di động</label>
               <input
                 type="text"
-                v-model="employee.PhoneNumber"
+                v-model="employee.phoneNumber"
                 class="m-input m-input-info"
                 name=""
                 id="txtfullname"
@@ -195,7 +195,7 @@
               <label for="">Đt cố định</label>
               <input
                 type="text"
-                v-model="employee.TelephoneNumber"
+                v-model="employee.telephoneNumber"
                 class="m-input m-input-info"
                 name=""
                 id="txtfullname"
@@ -205,7 +205,7 @@
               <label for="">Email</label>
               <input
                 type="text"
-                v-model="employee.Email"
+                v-model="employee.email"
                 class="m-input m-input-info"
                 name=""
                 id="txtfullname"
@@ -217,7 +217,7 @@
               <label for="">Tài khoản ngân hàng</label>
               <input
                 type="text"
-                v-model="employee.BankAccountNumber"
+                v-model="employee.bankAccountNumber"
                 class="m-input m-input-info"
                 name=""
                 id="txtfullname"
@@ -227,7 +227,7 @@
               <label for="">Tên ngân hàng</label>
               <input
                 type="text"
-                v-model="employee.BankName"
+                v-model="employee.bankName"
                 class="m-input m-input-info"
                 name=""
                 id="txtfullname"
@@ -237,7 +237,7 @@
               <label for="">Chi nhánh</label>
               <input
                 type="text"
-                v-model="employee.BankBranchName"
+                v-model="employee.bankBranchName"
                 class="m-input m-input-info"
                 name=""
                 id="txtfullname"
@@ -317,7 +317,7 @@ export default {
      * Author: NVChien (9/12/2021)
      */
     selectOptionDepartment(option) {
-      this.value = option.DepartmentName;
+      this.employee.departmentName = option.DepartmentName;
       this.employee.DepartmentId = option.DepartmentId;
     },
     /**

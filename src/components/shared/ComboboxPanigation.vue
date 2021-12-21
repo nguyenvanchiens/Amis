@@ -1,5 +1,5 @@
 <template>
-  <div class="record-per-page">
+  <div class="record-per-page" style="display: flex; align-items: center">
     <div class="m-custom-combobox bottom-combobox" id="cbxPaging">
       <input
         class="m-combobox m-combobox-input"

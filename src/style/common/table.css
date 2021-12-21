@@ -1,7 +1,7 @@
 /*Code phần table*/
 .m-table {
-  height: 545px;
-  overflow: auto;
+  height: 535px;
+  overflow: scroll;
   scrollbar-width: thin;
 }
 /*
@@ -10,10 +10,10 @@ custom scollbar
 .m-table::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-  background: #bbb;
+  background: rgb(156, 155, 155);
 }
 .m-table::-webkit-scrollbar-thumb {
-  background: #797878;
+  background: #494848;
 }
 
 table th {

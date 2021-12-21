@@ -40,7 +40,7 @@ export default {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
   padding: 16px;
   animation-name: toogle;
-  animation-duration: 3s;
+  animation-duration: 1.5s;
 }
 
 .m-toast-text {
@@ -54,9 +54,6 @@ export default {
 @keyframes toogle {
   0% {
     top: 0px;
-  }
-  25% {
-    top: 50px;
   }
 }
 </style>
