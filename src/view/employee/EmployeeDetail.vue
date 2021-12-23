@@ -38,7 +38,7 @@
                   type="text"
                   class="m-input m-input-employeecode"
                   name=""
-                  id="txtemployeecode"
+                  ref="txtemployeecode"
                 />
               </div>
               <div class="form-group">
@@ -58,7 +58,7 @@
                 <DropDown
                   :options="Department"
                   @select="selectOptionDepartment"
-                  :value="employee.departmentName"
+                  :departmentName="employee.departmentName"
                 />
               </div>
             </div>
@@ -72,10 +72,6 @@
                     id=""
                     class="s-combobox-input"
                   />
-                  <!-- <div class="s-combobox-buton">
-                    <i class="fas fa-sort-down"></i>
-                  </div>
-                  <div class="s-combobox-data"></div> -->
                 </div>
               </div>
             </div>
@@ -258,7 +254,7 @@
           <div>
             <button type="button" class="m-form-btn">Cất</button>
             <button type="submit" class="m-form-btn m-btn-save">
-              {{ text }}
+              {{ textSubmit }}
             </button>
           </div>
         </div>
@@ -270,41 +266,35 @@
 <script>
 import DropDown from "../../components/shared/DropDown.vue";
 import axios from "axios";
+import Resource from "../../js/base/Resource";
 export default {
-  props: {
-    isShow: Boolean,
-    employee: Object,
-    EmployeeId: String,
-    text: String,
-  },
+  props: {},
   created() {
     this.loadDepartment();
   },
   data() {
     return {
-      value: "",
+      departmentName: "",
       Department: [],
+      employee: {
+        employeeCode: "",
+        departmentName: "",
+        gender: "1",
+      },
+      checkStatusForm: 0,
+      textSubmit: "",
+      isShow: false,
     };
   },
   methods: {
-    /**
-     * Thêm mới hoặc sửa employee
-     * Author: NVChien (9/12/2021)
-     */
-    onSubmit() {
-      if (this.EmployeeId != "") {
-        this.$emit("update-employee", this.employee);
-      } else {
-        this.$emit("add-employee", this.employee);
-      }
-    },
+    created() {},
     /**
      * Lấy ra danh sách deparment để laod cbb
      * Author: NVChien (9/12/2021)
      */
     loadDepartment() {
       axios
-        .get(`http://amis.manhnv.net/api/v1/Departments`)
+        .get(`${Resource.AMIS_SERVICE_URL}/Departments`)
         .then((res) => {
           this.Department = res.data;
         })
@@ -317,16 +307,129 @@ export default {
      * Author: NVChien (9/12/2021)
      */
     selectOptionDepartment(option) {
-      this.employee.departmentName = option.DepartmentName;
-      this.employee.DepartmentId = option.DepartmentId;
+      console.log(option);
+      this.employee.departmentName = option.departmentName;
+      this.employee.departmentId = option.departmentId;
     },
     /**
      *Ẩn form
      * Author: NVChien(9/12/2021)
      */
     hideForm() {
-      this.value = "";
-      this.$emit("hide-form");
+      this.checkStatusForm = 0;
+      this.isShow = false;
+      this.employee = { employeeCode: "", departmentName: "", gender: "1" };
+    },
+    showForm(entity) {
+      const me = this;
+      if (entity) {
+        this.checkStatusForm = 1;
+        this.textSubmit = "Update";
+        entity.dateOfBirth = this.ChangeDate(entity.dateOfBirth);
+        entity.identityDate = this.ChangeDate(entity.identityDate);
+        entity.gender = this.ChangeGender(entity.gender);
+        this.employee = entity;
+      } else {
+        this.newCodeEmployee();
+        this.textSubmit = "ADD";
+      }
+      setTimeout(() => {
+        me.$refs.txtemployeecode.focus();
+      });
+      this.isShow = true;
+    },
+    /**
+     * Update employee
+     * Author:(8/12/2021)
+     */
+    onSubmit() {
+      const me = this;
+      console.log(this.employee);
+      if (this.checkStatusForm == 0) {
+        axios
+          .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
+          .then(() => {
+            this.hideForm();
+            this.checkStatusForm = 0;
+            me.$emit("addSuccess");
+          })
+          .catch((e) => {
+            console.log(e.response.data);
+          });
+      } else {
+        axios
+          .put(
+            `${Resource.AMIS_SERVICE_URL}/Employees/` +
+              this.employee.employeeId,
+            this.employee
+          )
+          .then(() => {
+            this.hideForm();
+            this.checkStatusForm = 0;
+            me.$emit("updateSuccess");
+          })
+          .catch((e) => {
+            console.log(e.response.data);
+          });
+      }
+    },
+    /**
+     * Chuyển đổi date
+     * Author: NVChien(7/12/2021)
+     */
+    ChangeDate(val) {
+      var date = new Date(val);
+      var reuslt = "";
+      if (val == "") {
+        reuslt = "";
+      } else {
+        if (Number.isNaN(date.getTime())) {
+          reuslt = "";
+        } else {
+          var day = date.getDate();
+          var month = date.getMonth() + 1;
+          var year = date.getFullYear();
+          day = day < 10 ? "0" + day : day;
+          month = month < 10 ? "0" + month : month;
+          reuslt = year + "-" + month + "-" + day;
+        }
+      }
+      return reuslt;
+    },
+    /**
+     * Chuyển đổi gender
+     * Author: NVChien(7/12/2021)
+     */
+    ChangeGender(val) {
+      var result = "";
+      if (val == "") {
+        result = "";
+      }
+      if (val == "Other") {
+        result = "2";
+      }
+      if (val == "Female") {
+        result = "1";
+      }
+      if (val == "Male") {
+        result = "0";
+      }
+      return result;
+    },
+    /**
+     * Lấy ra mã nhân viên mới
+     * CreatedBy: NVChien(23/12/2021)
+     */
+    newCodeEmployee() {
+      const me = this;
+      axios
+        .get(`${Resource.AMIS_SERVICE_URL}/Employees/NewCodeEmployee`)
+        .then((response) => {
+          me.employee.employeeCode = response.data;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   },
   components: {

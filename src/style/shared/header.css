@@ -24,6 +24,7 @@
 /*Header top right*/
 .m-header-top-right {
   display: flex;
+  align-items: center;
 }
 .m-header-top-notify i {
   font-size: 17px;
@@ -35,6 +36,14 @@
 .m-header-top-user {
   display: flex;
   margin-right: 10px;
+  margin-left: 10px;
+  align-items: center;
+  justify-content: center;
+}
+.m-header-top-user .m-icon-avatar {
+  border-radius: 50%;
+  margin-right: 6px;
+  cursor: pointer;
 }
 .m-user-icon {
   padding-top: 3px;

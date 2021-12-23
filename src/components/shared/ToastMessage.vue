@@ -1,11 +1,10 @@
 <template>
   <div class="m-toast .m-toast-success" v-show="isShowToast">
-    <i class="fas fa-check-circle" :style="{ color: toastColor }"></i>
+    <i class="fas fa-check-circle" style="color: green"></i>
     <div class="m-toast-text">{{ toastText }}</div>
     <span
       class="fas fa-times"
-      :style="{ color: toastColor }"
-      style="cursor: pointer"
+      style="cursor: pointer; margin-left: 10px; color: green"
     ></span>
   </div>
 </template>

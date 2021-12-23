@@ -11,13 +11,10 @@
       </div>
     </div>
     <div class="m-header-top-right">
-      <div class="m-header-top-notify">
-        <i class="far fa-bell"></i>
-      </div>
+      <div class="m-header-top-notify m-icon m-icon-bell icon-24"></div>
+
       <div class="m-header-top-user">
-        <div class="m-user-icon">
-          <i class="fas fa-user"></i>
-        </div>
+        <div class="m-icon m-icon-avatar icon-32"></div>
         <div class="m-user-text">
           <span>Nguyễn Văn Chiến</span>
           <i class="fas fa-angle-down"></i>

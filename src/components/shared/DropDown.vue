@@ -4,8 +4,7 @@
       type="text"
       id=""
       class="s-combobox-input"
-      :text="value"
-      v-model="value"
+      v-model="departmentName"
     />
     <div @click="showData" class="s-combobox-buton">
       <i class="fas fa-sort-down"></i>
@@ -13,12 +12,11 @@
     <div class="s-combobox-data" v-show="isShow">
       <div
         class="s-combobox-item"
-        value="1"
         v-for="(option, index) in options"
         :key="index"
         @click="select(option)"
       >
-        {{ option.DepartmentName }}
+        {{ option.departmentName }}
       </div>
     </div>
   </div>
@@ -27,11 +25,10 @@
 export default {
   props: {
     options: Array,
-    value: String,
+    departmentName: String,
   },
   data() {
     return {
-      Department: [],
       isShow: false,
     };
   },

@@ -46,6 +46,11 @@ export default {
   float: left;
   padding: 4px 8px;
 }
+.active {
+  border: 1px solid rgb(197, 194, 194);
+  color: black;
+  font-weight: bold;
+}
 
 .pagination a.active {
   background-color: green;

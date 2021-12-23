@@ -6,8 +6,19 @@
 </template>
 <script>
 export default {
-  props: {
-    isLoading: Boolean,
+  props: {},
+  data() {
+    return {
+      isLoading: false,
+    };
+  },
+  methods: {
+    showLoading() {
+      this.isLoading = true;
+    },
+    hideLoading() {
+      this.isLoading = false;
+    },
   },
   setup() {},
 };

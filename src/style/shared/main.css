@@ -5,6 +5,7 @@
 @import url(../common/message.css);
 @import url(../common/gird.css);
 @import url(../common/icon.css);
+@import url(../common/contextMenu.css);
 @import url(../common/loading.css);
 @import url(../../assets/fonts/fontawesome-5.15.1/css/all.min.css);
 @import url(../common/combobox.css);
@@ -15,13 +16,13 @@
 
 body {
   margin: 0;
-  font-family: Notosans-Regular;
+  font-family: Notosans-Bold;
   font-size: 13px;
   box-sizing: border-box;
 }
 @font-face {
   font-family: "Notosans-Bold";
-  src: url(../../assets/fonts/notosans-bold.3ede5aff.woff2);
+  src: url(../../assets/fonts/notosans-regular.2cb88a13.woff2);
 }
 @font-face {
   font-family: "Notosans-Italic";
@@ -30,14 +31,4 @@ body {
 @font-face {
   font-family: "Notosans-Semibold";
   src: url(../../assets/fonts/notosans-semibold.df3e6dc4.woff2);
-}
-
-input[type="radio" i] {
-  background-color: green !important;
-  cursor: default;
-  appearance: auto;
-  box-sizing: border-box;
-  margin: 3px 3px 0px 5px;
-  padding: initial;
-  border: initial;
 }
