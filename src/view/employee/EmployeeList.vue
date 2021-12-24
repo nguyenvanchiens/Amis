@@ -97,7 +97,7 @@
               </td>
               <td>{{ employee.employeeCode }}</td>
               <td>{{ employee.employeeName }}</td>
-              <td>{{ employee.gender | formatGender }}</td>
+              <td>{{ employee.genderName }}</td>
               <td class="m-text-center">
                 {{ employee.dateOfBirth | formatDate }}
               </td>
@@ -155,31 +155,7 @@
     </div>
     <EmployeeDetail ref="popupEmployeeDetail" />
     <!--Phần hiện thị msg delete-->
-    <div class="message" v-show="isShowFormDel">
-      <div class="message-content">
-        <div class="message-header">
-          <div class="header-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-          </div>
-          <div class="header-text" id="textMgg">
-            <span>{{ textMgs }}</span>
-          </div>
-        </div>
-        <div class="messgae-footer">
-          <div class="btn-group">
-            <button
-              type="button"
-              @click="hideFomrDel"
-              class="m-btn-default btn-close-delete"
-            >
-              Không
-            </button>
-            <button @click="Delete" class="btn-delete">Có</button>
-          </div>
-        </div>
-      </div>
-      <div class="dialog-background"></div>
-    </div>
+    <PopDelete @Delete="Delete" :textMgs="textMgs" ref="popUpDelete" />
     <!-- Phần loading -->
     <Loading ref="loading" />
     <!--Toast Message-->
@@ -191,11 +167,14 @@
 import axios from "axios";
 import $ from "jquery";
 import Resource from "../../js/base/Resource";
+import { Common } from "../../js/base/Common";
 import EmployeeDetail from "./EmployeeDetail.vue";
 import Loading from "../../components/shared/Loading.vue";
 import ToastMessage from "../../components/shared/ToastMessage.vue";
 import PaginationPage from "../../components/shared/PaginationPage.vue";
 import ComboboxPanigation from "../../components/shared/ComboboxPanigation.vue";
+
+import PopDelete from "../../components/shared/PopUpDelete.vue";
 
 export default {
   /**
@@ -223,6 +202,7 @@ export default {
     ToastMessage,
     ComboboxPanigation,
     PaginationPage,
+    PopDelete,
   },
   data() {
     return {
@@ -253,46 +233,6 @@ export default {
   },
   methods: {
     /**
-     * Thực hiện lấy toàn bộ Id nhân viên ô checkbox
-     * CreatedBy: NVChien (22/12/2021)
-     */
-    selectAllId() {
-      if (!this.isSelectAllId) {
-        for (let i in this.employees) {
-          this.selectedId.push(this.employees[i].employeeId);
-        }
-      } else {
-        this.selectedId = [];
-      }
-      console.log(this.selectedId);
-    },
-    /**
-     * Thực hiện lấy từng giá trị Id nhân viên một, tham số truyền vào là một EmployeeId
-     * CreatedBy: NVChien (22/12/2021)
-     */
-    selectId(employeeId) {
-      // kiểm tra xem Id đã tồn tại trong mảng selectedId hay chưa
-      if (!this.selectedId.includes(employeeId)) {
-        this.selectedId.push(employeeId);
-      } else {
-        // nếu Id đã tồn tại trong mảng selectedId thì sẽ xoá Id đó khỏi mảng - tức là khi 2 lần vào ô checkbox
-        this.selectedId.forEach((item, index) => {
-          if (employeeId == item) {
-            this.selectedId.splice(index, 1);
-          }
-        });
-      }
-      console.log(this.selectedId);
-    },
-    /**
-     * Show Form Update
-     * Author: NVChien(7/12/2021)
-     */
-    showFormDetail(employee) {
-      const me = this;
-      me.$refs.popupEmployeeDetail.showForm(employee);
-    },
-    /**
      * Load dữ liệu nhân viên
      * Author: NVChien (07/12/2021)
      */
@@ -311,123 +251,42 @@ export default {
         });
     },
     /**
-     * Hiện chức năng xóa nhân bản cho từng table
-     * Author: NVChien (07/12/2021)
+     * Thực hiện lấy toàn bộ Id nhân viên ô checkbox
+     * CreatedBy: NVChien (22/12/2021)
      */
-    showListRowTable(e, employee) {
-      this.toogleMenu = true;
-      var positionMenu = e.target;
-      let contextMenu = $("#contextMenu");
-      contextMenu.toggle();
-      let top_pos = $(positionMenu).offset().top;
-      let left_pos = $(positionMenu).offset().left;
-      if (top_pos + 24 <= window.innerHeight - 90) {
-        contextMenu.css("top", `calc(${top_pos}px + 24px)`);
+    selectAllId() {
+      if (!this.isSelectAllId) {
+        for (let i in this.employees) {
+          this.selectedId.push(this.employees[i].employeeId);
+        }
       } else {
-        contextMenu.css("top", `calc(${top_pos}px - 88px)`);
-      }
-      contextMenu.css("left", `calc(${left_pos}px - 115px)`);
-      this.employeeCode = employee.employeeCode;
-      this.EmployeeId = employee.employeeId;
-    },
-    /**
-     * hiện form xóa
-     * Author: NVChien(10/12/2021)
-     */
-    showFomrDel() {
-      this.toogleMenu = !this.toogleMenu;
-      this.textMgs = `Bạn có muốn xóa nhân viên có mã <${this.employeeCode}> không?`;
-      this.isShowFormDel = !this.isShowFormDel;
-    },
-    /**
-     * Ẩn form xóa
-     * Author: NVChien(10/12/2021)
-     */
-    hideFomrDel() {
-      this.EmployeeId = "";
-      this.isShowFormDel = !this.isShowFormDel;
-    },
-    /**
-     * Xóa nhân viên hoặc xóa nhiều bản ghi
-     * Author: NvChien(12/10/2021)
-     */
-    Delete() {
-      if (this.selectedId.length > 0) {
-        axios
-          .post(
-            `${Resource.AMIS_SERVICE_URL}/Employees/DeleteMulti/`,
-            this.selectedId
-          )
-          .then(() => {
-            this.hideFomrDel();
-            this.selectedId = [];
-            this.showToastMessage();
-            this.toastText = "Xóa danh sách thành công thành công";
-            this.refresh();
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      } else {
-        axios
-          .delete(`${Resource.AMIS_SERVICE_URL}/Employees/` + this.EmployeeId)
-          .then(() => {
-            console.log("xóa thành công");
-            this.hideFomrDel();
-            this.showToastMessage();
-            this.toastText = "Xóa thành công";
-            this.refresh();
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        this.selectedId = [];
       }
     },
     /**
-     * Xóa nhiều bản ghi
-     * CreateBy: NVChien(23/12/2021)
+     * Thực hiện lấy từng giá trị Id nhân viên một, tham số truyền vào là một EmployeeId
+     * CreatedBy: NVChien (22/12/2021)
      */
-    DelMutlRecord() {
-      this.toggleDelMuti = !this.toggleDelMuti;
-      this.toogleMenu = !this.toogleMenu;
-      this.textMgs = `Bạn có thực sự muốn danh danh sách nhân viên đã chọn?`;
-      this.isShowFormDel = !this.isShowFormDel;
+    selectId(employeeId) {
+      // kiểm tra xem Id đã tồn tại trong mảng selectedId hay chưa
+      if (!this.selectedId.includes(employeeId)) {
+        this.selectedId.push(employeeId);
+      } else {
+        // nếu Id đã tồn tại trong mảng selectedId thì sẽ xoá Id đó khỏi mảng - tức là khi 2 lần vào ô checkbox
+        this.selectedId.forEach((item, index) => {
+          if (employeeId == item) {
+            this.selectedId.splice(index, 1);
+          }
+        });
+      }
     },
     /**
-     * Xuất file execl cho bảng
-     * CreatedBy: NVChien(23/12/2021)
+     * Show Form Update
+     * Author: NVChien(7/12/2021)
      */
-    exportExecl() {
-      axios.get("https://localhost:44320/api/v1/Employees/Export");
-    },
-    /**
-     * Hiển thị toast message
-     * CreatedBy: NVChien (15/12/2021)
-     */
-    showToastMessage(string) {
-      setTimeout(() => {
-        this.isShowToast = true;
-      }, 1000);
-      setTimeout(() => {
-        this.isShowToast = false;
-      }, 3000);
-      this.toastText = string;
-    },
-    /**
-     * Chuyển trang
-     * CreatedBy: NVChien (20/12/2021)
-     */
-    changePageNumber(pageIndex) {
-      this.pageIndex = pageIndex;
-      this.loadData();
-    },
-    /**
-     * Số lượng bản ghi trên một trang
-     * CreatedBy: NVChien (18/12/2021)
-     */
-    changeRecordNumber(pageRecord) {
-      this.pageSize = pageRecord;
-      this.loadData();
+    showFormDetail(employee) {
+      const me = this;
+      me.$refs.popupEmployeeDetail.showForm(employee);
     },
     /**
      * Hiện form chi tiết employee
@@ -457,6 +316,126 @@ export default {
         this.$refs.loading.hideLoading();
       }, 1000);
     },
+    /**
+     * Hiện chức năng xóa nhân bản cho từng table
+     * Author: NVChien (07/12/2021)
+     */
+    showListRowTable(e, employee) {
+      this.toogleMenu = true;
+      var positionMenu = e.target;
+      let contextMenu = $("#contextMenu");
+      contextMenu.toggle();
+      let top_pos = $(positionMenu).offset().top;
+      let left_pos = $(positionMenu).offset().left;
+      if (top_pos + 24 <= window.innerHeight - 90) {
+        contextMenu.css("top", `calc(${top_pos}px + 24px)`);
+      } else {
+        contextMenu.css("top", `calc(${top_pos}px - 88px)`);
+      }
+      contextMenu.css("left", `calc(${left_pos}px - 115px)`);
+      this.employeeCode = employee.employeeCode;
+      this.EmployeeId = employee.employeeId;
+    },
+    /**
+     * hiện form xóa
+     * Author: NVChien(10/12/2021)
+     */
+    showFomrDel() {
+      const me = this;
+      me.$refs.popUpDelete.showForm();
+      me.textMgs = `Bạn có muốn xóa nhân viên có mã <${me.employeeCode}> không?`;
+      me.toogleMenu = !me.toogleMenu;
+    },
+    /**
+     * Ẩn form xóa
+     * Author: NVChien(10/12/2021)
+     */
+    hideFomrDel() {
+      this.EmployeeId = "";
+      this.popUpDelete = !this.isShowFormDel;
+    },
+    /**
+     * Xóa nhân viên hoặc xóa nhiều bản ghi
+     * Author: NvChien(12/10/2021)
+     */
+    Delete() {
+      if (this.selectedId.length > 0) {
+        axios
+          .post(
+            `${Resource.AMIS_SERVICE_URL}/Employees/DeleteMulti/`,
+            this.selectedId
+          )
+          .then(() => {
+            this.$refs.popUpDelete.hideForm();
+            this.selectedId = [];
+            this.showToastMessage();
+            this.toastText = "Xóa danh sách thành công thành công";
+            this.refresh();
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } else {
+        axios
+          .delete(`${Resource.AMIS_SERVICE_URL}/Employees/` + this.EmployeeId)
+          .then(() => {
+            console.log("xóa thành công");
+            this.$refs.popUpDelete.hideForm();
+            this.showToastMessage();
+            this.toastText = "Xóa thành công";
+            this.refresh();
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    },
+    /**
+     * Xóa nhiều bản ghi
+     * CreateBy: NVChien(23/12/2021)
+     */
+    DelMutlRecord() {
+      this.toggleDelMuti = !this.toggleDelMuti;
+      this.toogleMenu = !this.toogleMenu;
+      this.textMgs = `Bạn có thực sự muốn danh danh sách nhân viên đã chọn?`;
+      this.$refs.popUpDelete.showForm();
+    },
+    /**
+     * Xuất file execl cho bảng
+     * CreatedBy: NVChien(23/12/2021)
+     */
+    exportExecl() {
+      axios.get("https://localhost:44320/api/v1/Employees/Export");
+    },
+    /**
+     * Hiển thị toast message
+     * CreatedBy: NVChien (15/12/2021)
+     */
+    showToastMessage(string) {
+      setTimeout(() => {
+        this.isShowToast = true;
+      }, 1000);
+      setTimeout(() => {
+        this.isShowToast = false;
+      }, 3000);
+      this.toastText = string;
+    },
+    /**
+     * Chuyển trang
+     * CreatedBy: NVChien (20/12/2021)
+     */
+    changePageNumber(pageIndex) {
+      this.loadData();
+      this.pageIndex = pageIndex;
+    },
+    /**
+     * Số lượng bản ghi trên một trang
+     * CreatedBy: NVChien (18/12/2021)
+     */
+    changeRecordNumber(pageRecord) {
+      this.pageSize = pageRecord;
+      this.loadData();
+    },
   },
   watch: {
     /**
@@ -468,35 +447,8 @@ export default {
     },
   },
   filters: {
-    formatGender(val) {
-      var result = "";
-      switch (val) {
-        case "Male":
-          result = "Nữ";
-          break;
-        case "Female":
-          result = "Nam";
-          break;
-        default:
-          result = "Khác";
-          break;
-      }
-      return result;
-    },
     formatDate(val) {
-      var result = "";
-      var date = new Date(val);
-      if (Number.isNaN(date.getTime())) {
-        result = "";
-      } else {
-        var day = date.getDate();
-        var month = date.getMonth() + 1;
-        var year = date.getFullYear();
-        day = day < 10 ? "0" + day : day;
-        month = month < 10 ? "0" + month : month;
-        result = day + "/" + month + "/" + year;
-      }
-      return result;
+      return Common.formatDate(val);
     },
   },
 };

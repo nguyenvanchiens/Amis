@@ -261,12 +261,16 @@
       </form>
     </div>
     <div class="dialog-background"></div>
+    <!-- popuoError -->
+    <PopUpError ref="popUpError" :textMgs="textMgs" />
   </div>
 </template>
 <script>
 import DropDown from "../../components/shared/DropDown.vue";
+import PopUpError from "../../components/shared/PopUpError.vue";
 import axios from "axios";
 import Resource from "../../js/base/Resource";
+import { Common } from "../../js/base/Common";
 export default {
   props: {},
   created() {
@@ -281,6 +285,7 @@ export default {
         departmentName: "",
         gender: "1",
       },
+      textMgs: "",
       checkStatusForm: 0,
       textSubmit: "",
       isShow: false,
@@ -307,7 +312,6 @@ export default {
      * Author: NVChien (9/12/2021)
      */
     selectOptionDepartment(option) {
-      console.log(option);
       this.employee.departmentName = option.departmentName;
       this.employee.departmentId = option.departmentId;
     },
@@ -324,14 +328,14 @@ export default {
       const me = this;
       if (entity) {
         this.checkStatusForm = 1;
-        this.textSubmit = "Update";
+        this.textSubmit = "Sửa";
         entity.dateOfBirth = this.ChangeDate(entity.dateOfBirth);
         entity.identityDate = this.ChangeDate(entity.identityDate);
         entity.gender = this.ChangeGender(entity.gender);
         this.employee = entity;
       } else {
         this.newCodeEmployee();
-        this.textSubmit = "ADD";
+        this.textSubmit = "Cất Và Thêm";
       }
       setTimeout(() => {
         me.$refs.txtemployeecode.focus();
@@ -344,7 +348,6 @@ export default {
      */
     onSubmit() {
       const me = this;
-      console.log(this.employee);
       if (this.checkStatusForm == 0) {
         axios
           .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
@@ -354,7 +357,10 @@ export default {
             me.$emit("addSuccess");
           })
           .catch((e) => {
-            console.log(e.response.data);
+            if (e.response.status == 400) {
+              me.textMgs = e.response.data.data[0];
+              me.$refs.popUpError.showForm();
+            }
           });
       } else {
         axios
@@ -369,7 +375,10 @@ export default {
             me.$emit("updateSuccess");
           })
           .catch((e) => {
-            console.log(e.response.data);
+            if (e.response.status == 400) {
+              me.textMgs = e.response.data.data[0];
+              me.$refs.popUpError.showForm();
+            }
           });
       }
     },
@@ -378,43 +387,14 @@ export default {
      * Author: NVChien(7/12/2021)
      */
     ChangeDate(val) {
-      var date = new Date(val);
-      var reuslt = "";
-      if (val == "") {
-        reuslt = "";
-      } else {
-        if (Number.isNaN(date.getTime())) {
-          reuslt = "";
-        } else {
-          var day = date.getDate();
-          var month = date.getMonth() + 1;
-          var year = date.getFullYear();
-          day = day < 10 ? "0" + day : day;
-          month = month < 10 ? "0" + month : month;
-          reuslt = year + "-" + month + "-" + day;
-        }
-      }
-      return reuslt;
+      return Common.ChangeDate(val);
     },
     /**
      * Chuyển đổi gender
      * Author: NVChien(7/12/2021)
      */
     ChangeGender(val) {
-      var result = "";
-      if (val == "") {
-        result = "";
-      }
-      if (val == "Other") {
-        result = "2";
-      }
-      if (val == "Female") {
-        result = "1";
-      }
-      if (val == "Male") {
-        result = "0";
-      }
-      return result;
+      return Common.ChangeGender(val);
     },
     /**
      * Lấy ra mã nhân viên mới
@@ -434,6 +414,7 @@ export default {
   },
   components: {
     DropDown,
+    PopUpError,
   },
 };
 </script>
