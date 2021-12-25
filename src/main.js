@@ -7,6 +7,7 @@ import Home from "./view/dashboard/Index";
 import Employee from "./view/employee/EmployeeList";
 import Customer from "./view/customer/CustomerList";
 import Student from "./view/stuent/StudentList";
+import Vuelidate from "vuelidate";
 
 const routes = [
   {
@@ -37,6 +38,7 @@ const router = new VueRouter({
 });
 
 Vue.use(VueRouter);
+Vue.use(Vuelidate);
 Vue.config.productionTip = false;
 
 new Vue({

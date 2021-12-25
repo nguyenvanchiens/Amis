@@ -22,7 +22,7 @@ button {
   background-color: rgb(41, 162, 25);
   color: white;
   cursor: pointer;
-  padding-left: 15px;
+  padding: 0 15px;
 }
 .m-btn:hover {
   background-color: rgb(47, 190, 28);

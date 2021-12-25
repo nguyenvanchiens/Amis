@@ -5,6 +5,8 @@
       :click-handler="changePageNumber"
       :containerClass="'pagination'"
       class="pagination"
+      :prevText="'Trước'"
+      :nextText="'Sau'"
       v-model="pageNumber"
     >
     </Paginate>

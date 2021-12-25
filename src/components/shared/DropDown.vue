@@ -5,6 +5,11 @@
       id=""
       class="s-combobox-input"
       v-model="departmentName"
+      :class="{
+        'm-input-error': $v.departmentName.$error,
+      }"
+      @blur="$v.departmentName.$touch()"
+      :title="$v.departmentName.$error ? titleDepartmentNameIsNull : null"
     />
     <div @click="showData" class="s-combobox-buton">
       <i class="fas fa-sort-down"></i>
@@ -22,10 +27,12 @@
   </div>
 </template>
 <script>
+import { required } from "vuelidate/lib/validators";
 export default {
   props: {
     options: Array,
     departmentName: String,
+    titleDepartmentNameIsNull: String,
   },
   data() {
     return {
@@ -47,6 +54,11 @@ export default {
     select(option) {
       this.isShow = !this.isShow;
       this.$emit("select", option);
+    },
+  },
+  validations: {
+    departmentName: {
+      required,
     },
   },
 };

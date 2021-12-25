@@ -14,7 +14,8 @@
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
     "vue-simple-search-dropdown": "^1.0.1",
-    "vuejs-paginate": "^2.1.0"
+    "vuejs-paginate": "^2.1.0",
+    "vuelidate": "^0.7.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

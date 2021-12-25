@@ -39,6 +39,13 @@
                   class="m-input m-input-employeecode"
                   name=""
                   ref="txtemployeecode"
+                  :class="{ 'm-input-error': $v.employee.employeeCode.$error }"
+                  @blur="$v.employee.employeeCode.$touch()"
+                  :title="
+                    $v.employee.employeeCode.$error
+                      ? titleEmployeeCodeIsNull
+                      : null
+                  "
                 />
               </div>
               <div class="form-group">
@@ -49,6 +56,11 @@
                   class="m-input m-input-fullname"
                   name=""
                   id="txtfullname"
+                  :class="{ 'm-input-error': $v.employee.employeeName.$error }"
+                  @blur="$v.employee.employeeName.$touch()"
+                  :title="
+                    $v.employee.employeeName.$error ? titleEmployeeIsNull : null
+                  "
                 />
               </div>
             </div>
@@ -59,12 +71,13 @@
                   :options="Department"
                   @select="selectOptionDepartment"
                   :departmentName="employee.departmentName"
+                  :titleDepartmentNameIsNull="titleDepartmentNameIsNull"
                 />
               </div>
             </div>
             <div class="form-group-row">
               <div class="form-group">
-                <label for="">Chức danh <span>*</span></label>
+                <label for="">Chức danh</label>
                 <div class="scombobox">
                   <input
                     type="text"
@@ -79,7 +92,7 @@
           <div class="form-info-right">
             <div class="form-group-row">
               <div class="form-group">
-                <label for="">Ngày sinh <span>*</span></label>
+                <label for="">Ngày sinh</label>
                 <input
                   type="date"
                   v-model="employee.dateOfBirth"
@@ -89,7 +102,7 @@
                 />
               </div>
               <div class="form-group">
-                <label for="" class="lbgender">Giới tính <span>*</span></label>
+                <label for="" class="lbgender">Giới tính</label>
                 <div class="group-radio">
                   <div class="group-radio-item">
                     <input
@@ -271,6 +284,7 @@ import PopUpError from "../../components/shared/PopUpError.vue";
 import axios from "axios";
 import Resource from "../../js/base/Resource";
 import { Common } from "../../js/base/Common";
+import { required } from "vuelidate/lib/validators";
 export default {
   props: {},
   created() {
@@ -280,8 +294,12 @@ export default {
     return {
       departmentName: "",
       Department: [],
+      titleEmployeeIsNull: Resource["VN"].Warning.FullNameIsEmpty,
+      titleEmployeeCodeIsNull: Resource["VN"].Warning.FullNameIsEmpty,
+      titleDepartmentNameIsNull: Resource["VN"].Warning.DepartmentIsEmpty,
       employee: {
         employeeCode: "",
+        employeeName: "Nguyễn Văn Chiến",
         departmentName: "",
         gender: "1",
       },
@@ -322,7 +340,12 @@ export default {
     hideForm() {
       this.checkStatusForm = 0;
       this.isShow = false;
-      this.employee = { employeeCode: "", departmentName: "", gender: "1" };
+      this.employee = {
+        employeeCode: "",
+        departmentName: "",
+        gender: "1",
+        employeeName: "Nguyễn Văn Chiến",
+      };
     },
     showForm(entity) {
       const me = this;
@@ -410,6 +433,16 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+  },
+  validations: {
+    employee: {
+      employeeCode: {
+        required,
+      },
+      employeeName: {
+        required,
+      },
     },
   },
   components: {

@@ -8,22 +8,22 @@
     </div>
     <div class="m-wrap-content">
       <div class="m-content-search">
-        <div class="m-content-multidel">
-          <div class="multidel-text">
-            <div class="icon" @click="toggleDelMuti = !toggleDelMuti">
-              <div class="text">
-                <span>Thực hiện hàng loạt</span>
-              </div>
-              <div class="icon">
-                <i class="fas fa-sort-down"></i>
-              </div>
-            </div>
-            <div
-              class="multidel-item"
-              v-show="toggleDelMuti && selectedId.length > 0"
+        <div class="m-content-multidel" @click="toggleDelMuti = !toggleDelMuti">
+          <div class="m-content-multidel-text">Thực hiện hàng loạt</div>
+          <div
+            :style="selectedId.length > 1 ? 'opacity:1' : ''"
+            class="m-content-multidel-icon m-icon icon-16 mi-arrow-up--black"
+          ></div>
+          <div
+            class="multidel-item"
+            v-show="toggleDelMuti && selectedId.length > 1"
+          >
+            <span
+              class="item-text"
+              style="font-size: 16px"
+              @click="DelMutlRecord"
+              >xóa</span
             >
-              <span style="font-size: 16px" @click="DelMutlRecord">xóa</span>
-            </div>
           </div>
         </div>
         <div class="m-content-right">

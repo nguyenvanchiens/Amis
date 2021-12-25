@@ -11,7 +11,10 @@
         class="m-combobox-btn combobox-dropdown-btn"
         @click="isShow = !isShow"
       >
-        <div class="m-icon icon-16 m-icon-arrow-down"></div>
+        <div
+          class="m-icon icon-16 m-icon-arrow-down"
+          :class="isShow ? 'rotate' : ''"
+        ></div>
       </button>
 
       <div class="m-combobox-data" v-show="isShow">
@@ -56,3 +59,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.rotate {
+  transform: rotate(180deg);
+  transition: all 0.15s linear;
+}
+</style>

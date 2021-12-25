@@ -28,7 +28,7 @@ export default {
 <style>
 .m-toast {
   position: absolute;
-  top: 70px;
+  top: 50px;
   left: 600px;
   display: flex;
   align-items: center;
