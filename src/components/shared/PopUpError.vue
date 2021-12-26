@@ -1,20 +1,9 @@
 <template>
   <div class="message" v-show="isShow">
-    <div
-      class="message-content"
-      style="
-        box-shadow: 2px 1px 7px -1px #a09898;
-        top: 44%;
-        z-index: 220;
-        width: 371px;
-        height: 143px;
-      "
-    >
+    <div class="message-content">
       <div class="message-header">
-        <div class="header-warning">
-          <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="header-text" id="textMgg">
+        <div class="m-icon mi-48 mi-exclamation-error-48-2"></div>
+        <div class="header-text" id="textMgg" style="margin-left: 10px">
           <span>{{ textMgs }}</span>
         </div>
       </div>
@@ -47,4 +36,29 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.message-content {
+  box-shadow: 2px 1px 7px -1px #a09898;
+  top: 44%;
+  z-index: 220;
+  width: 371px;
+  height: 143px;
+  animation: fadein 0.1s;
+}
+.message-content {
+  z-index: 260 !important;
+  transition: all 1s;
+}
+.dialog-background {
+  z-index: 250 !important;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</style>

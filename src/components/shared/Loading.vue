@@ -14,7 +14,12 @@ export default {
   },
   methods: {
     showLoading() {
-      this.isLoading = true;
+      setTimeout(() => {
+        this.isLoading = !this.isLoading;
+      }, 0);
+      setTimeout(() => {
+        this.isLoading = !this.isLoading;
+      }, 1000);
     },
     hideLoading() {
       this.isLoading = false;

@@ -1,11 +1,9 @@
-.message {
-}
 .message-content {
-  width: 400px;
-  height: 149px;
+  width: 420px;
+  height: 150px;
   background-color: white;
   padding: 37px 30px 0px 40px;
-  z-index: 130;
+  z-index: 260;
   position: absolute;
   border-radius: 4px;
   top: 40%;
@@ -13,7 +11,7 @@
   transform: translate(-50%, -50%);
 }
 .message-header {
-  padding-bottom: 32px;
+  padding-bottom: 18px;
   padding-right: 10px;
   padding-left: 10px;
   display: flex;

@@ -8,8 +8,8 @@
 custom scollbar
 */
 .m-table::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: rgb(156, 155, 155);
 }
 .m-table::-webkit-scrollbar-thumb {

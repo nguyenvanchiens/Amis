@@ -33,15 +33,14 @@
   min-height: 14px;
 }
 
-.icon-48 {
+.mi-exclamation-error-48-2 {
+  background-position: -24px -954px;
+}
+.mi-48 {
   width: 48px;
   height: 48px;
   min-width: 48px;
   min-height: 48px;
-}
-
-.m-icon-exclaimation-warning {
-  background-position: -592px -456px;
 }
 
 .m-icon-help {
@@ -50,6 +49,9 @@
 
 .m-icon-close {
   background-position: -145px -144px;
+}
+.m-icon-question {
+  background-position: -826px -456px;
 }
 
 .m-icon-arrow-up--blue {

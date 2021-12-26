@@ -63,10 +63,10 @@
                 />
               </th>
               <th class="text-align-left w150">Mã nhân viên</th>
-              <th class="text-align-left w200">Tên nhân viên</th>
+              <th class="text-align-left w150">Tên nhân viên</th>
               <th class="text-align-left w100">Giới tính</th>
               <th class="m-text-center w100">Ngày sinh</th>
-              <th class="text-align-left w100">Số CMND</th>
+              <th class="text-align-left w150">Số CMND</th>
               <th class="text-align-left w100">Chức danh</th>
               <th class="text-align-left" style="min-width: 200px">
                 Tên đơn vị
@@ -185,12 +185,19 @@ export default {
     const me = this;
     me.$refs.popupEmployeeDetail.$on("updateSuccess", function () {
       me.refresh();
-      me.showToastMessage("Update thành công");
-      this.toastText = "Update thành công";
+      me.showToastMessage("Sửa thành công");
     });
     me.$refs.popupEmployeeDetail.$on("addSuccess", function () {
       me.refresh();
-      me.showToastMessage("Add thành công");
+      me.showToastMessage("Thêm mới thành công");
+    });
+    me.$refs.popupEmployeeDetail.$on("updateSuccessContinue", function () {
+      me.$refs.loading.showLoading();
+      me.loadData();
+    });
+    me.$refs.popupEmployeeDetail.$on("addSuccessContinue", function () {
+      me.$refs.loading.showLoading();
+      me.loadData();
     });
   },
   created() {
@@ -286,7 +293,14 @@ export default {
      */
     showFormDetail(employee) {
       const me = this;
-      me.$refs.popupEmployeeDetail.showForm(employee);
+      axios
+        .get(`${Resource.AMIS_SERVICE_URL}/Employees/` + employee.employeeId)
+        .then((response) => {
+          me.$refs.popupEmployeeDetail.showForm(response.data);
+        })
+        .catch((e) => {
+          this.errors.push(e);
+        });
     },
     /**
      * Hiện form chi tiết employee
@@ -308,13 +322,9 @@ export default {
      */
     refresh() {
       this.EmployeeId = "";
+      this.searchText = "";
       this.loadData();
-      setTimeout(() => {
-        this.$refs.loading.showLoading();
-      }, 0);
-      setTimeout(() => {
-        this.$refs.loading.hideLoading();
-      }, 1000);
+      this.$refs.loading.showLoading();
     },
     /**
      * Hiện chức năng xóa nhân bản cho từng table
@@ -371,6 +381,7 @@ export default {
             this.showToastMessage();
             this.toastText = "Xóa danh sách thành công thành công";
             this.refresh();
+            this.toogleMenu = !this.toogleMenu;
           })
           .catch((e) => {
             console.log(e);
@@ -425,8 +436,8 @@ export default {
      * CreatedBy: NVChien (20/12/2021)
      */
     changePageNumber(pageIndex) {
-      this.loadData();
       this.pageIndex = pageIndex;
+      this.loadData();
     },
     /**
      * Số lượng bản ghi trên một trang
@@ -447,6 +458,10 @@ export default {
     },
   },
   filters: {
+    /**
+     * Chuyển dữ liệu dateTime về dữ liệu đẹp
+     * CreateBy: NVCHien(21/12/2021)
+     */
     formatDate(val) {
       return Common.formatDate(val);
     },

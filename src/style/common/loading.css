@@ -20,6 +20,7 @@
   background-position: center;
   background-size: contain;
   animation: spin 2s linear infinite;
+  z-index: 260;
 }
 
 @keyframes spin {

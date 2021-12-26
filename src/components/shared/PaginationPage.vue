@@ -43,10 +43,12 @@ export default {
   justify-content: center;
   padding: 0;
   margin-left: 10px;
+  cursor: pointer;
 }
 .pagination a {
   float: left;
   padding: 4px 8px;
+  cursor: pointer;
 }
 .active {
   border: 1px solid rgb(197, 194, 194);

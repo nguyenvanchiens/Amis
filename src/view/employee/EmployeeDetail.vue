@@ -27,7 +27,7 @@
           </button>
         </div>
       </div>
-      <form @submit.prevent="onSubmit">
+      <div>
         <div class="form-info">
           <div class="form-info-left">
             <div class="form-group-row">
@@ -111,7 +111,7 @@
                       class=""
                       value="1"
                       name="gender"
-                      id="rdgenderFale"
+                      id="rdgenderMale"
                     />
                     <label for="">Nam</label>
                   </div>
@@ -213,9 +213,12 @@
             <div class="form-group">
               <label for="">Email</label>
               <input
-                type="text"
+                type="email"
                 v-model="employee.email"
                 class="m-input m-input-info"
+                :class="{ 'm-input-error': $v.employee.email.$error }"
+                @blur="$v.employee.email.$touch()"
+                :title="$v.employee.email.$error ? emailError : null"
                 name=""
                 id="txtfullname"
               />
@@ -265,26 +268,40 @@
             </button>
           </div>
           <div>
-            <button type="button" class="m-form-btn">Cất</button>
-            <button type="submit" class="m-form-btn m-btn-save">
-              {{ textSubmit }}
+            <button type="button" @click="saveAndClose" class="m-form-btn">
+              Cất
+            </button>
+            <button
+              type="button"
+              class="m-form-btn m-btn-save"
+              @click="saveAndContinue"
+            >
+              Cất và Thêm
             </button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
     <div class="dialog-background"></div>
-    <!-- popuoError -->
+    <!-- popupError -->
     <PopUpError ref="popUpError" :textMgs="textMgs" />
+    <!-- popup Alert lưu khi đã phát sinh dữ liệu-->
+    <PopUpChangValue
+      :isShowAlert="isShowAlert"
+      @closeFormAlert="closeFormAlert"
+      @clearForm="clearForm"
+      @saveAndClose="saveAndClose"
+    />
   </div>
 </template>
 <script>
 import DropDown from "../../components/shared/DropDown.vue";
 import PopUpError from "../../components/shared/PopUpError.vue";
+import PopUpChangValue from "../../components/shared/PopUpChangValue.vue";
 import axios from "axios";
 import Resource from "../../js/base/Resource";
 import { Common } from "../../js/base/Common";
-import { required } from "vuelidate/lib/validators";
+import { required, email } from "vuelidate/lib/validators";
 export default {
   props: {},
   created() {
@@ -302,11 +319,24 @@ export default {
         employeeName: "Nguyễn Văn Chiến",
         departmentName: "",
         gender: "1",
+        dateOfBirth: "2000-04-16",
+        identityNumber: "033200003877",
+        identityDate: "2015-05-17",
+        identityPlace: "Hưng Yên",
+        employeePosition: "Nhân viên",
+        address: "Hưng Yên",
+        telephoneNumber: "0987675432",
+        email: "chienymhy@gmail.com",
+        bankAccountNumber: "02547352",
+        bankName: "acb",
+        bankBranchName: "Hưng Yên",
       },
+      isShowAlert: false,
       textMgs: "",
       checkStatusForm: 0,
-      textSubmit: "",
       isShow: false,
+      valueChanged: 0,
+      emailError: Resource["VN"].Warning.EmailError,
     };
   },
   methods: {
@@ -338,16 +368,25 @@ export default {
      * Author: NVChien(9/12/2021)
      */
     hideForm() {
-      this.checkStatusForm = 0;
-      this.isShow = false;
-      this.employee = {
-        employeeCode: "",
-        departmentName: "",
-        gender: "1",
-        employeeName: "Nguyễn Văn Chiến",
-      };
+      if (this.valueChanged > 2) {
+        this.isShowAlert = !this.isShowAlert;
+      } else {
+        this.checkStatusForm = 0;
+        this.employee = {
+          employeeCode: "",
+          departmentName: "",
+          gender: "1",
+          employeeName: "Nguyễn Văn Chiến",
+        };
+        this.isShow = false;
+      }
     },
+    /**
+     * Hiện from chi tiết hoặc thêm mới
+     * CreateBY: NVChien(23/12/2021)
+     */
     showForm(entity) {
+      this.valueChanged = 0;
       const me = this;
       if (entity) {
         this.checkStatusForm = 1;
@@ -357,8 +396,24 @@ export default {
         entity.gender = this.ChangeGender(entity.gender);
         this.employee = entity;
       } else {
+        this.employee = {
+          employeeCode: "",
+          employeeName: "Nguyễn Văn Chiến",
+          departmentName: "",
+          gender: "1",
+          dateOfBirth: "2000-04-16",
+          identityNumber: "033200003877",
+          identityDate: "2015-05-17",
+          identityPlace: "Hưng Yên",
+          employeePosition: "Nhân viên",
+          email: "chienymhy@gmail.com",
+          telephoneNumber: "0987675432",
+          address: "Hưng Yên",
+          bankAccountNumber: "02547352",
+          bankName: "acb",
+          bankBranchName: "Hưng Yên",
+        };
         this.newCodeEmployee();
-        this.textSubmit = "Cất Và Thêm";
       }
       setTimeout(() => {
         me.$refs.txtemployeecode.focus();
@@ -366,22 +421,40 @@ export default {
       this.isShow = true;
     },
     /**
-     * Update employee
+     * Update employee và giữ lại form
      * Author:(8/12/2021)
      */
-    onSubmit() {
+    saveAndContinue() {
       const me = this;
       if (this.checkStatusForm == 0) {
         axios
           .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
           .then(() => {
-            this.hideForm();
             this.checkStatusForm = 0;
-            me.$emit("addSuccess");
+            this.newCodeEmployee();
+            this.employee = {
+              employeeCode: "",
+              employeeName: "Nguyễn Văn Chiến",
+              departmentName: "",
+              gender: "1",
+              dateOfBirth: "2000-04-16",
+              identityNumber: "033200003877",
+              identityDate: "2015-05-17",
+              identityPlace: "Hưng Yên",
+              employeePosition: "Nhân viên",
+              email: "chienymhy@gmail.com",
+              telephoneNumber: "0987675432",
+              address: "Hưng Yên",
+              bankAccountNumber: "02547352",
+              bankName: "acb",
+              bankBranchName: "Hưng Yên",
+            };
+            me.$emit("addSuccessContinue");
           })
           .catch((e) => {
             if (e.response.status == 400) {
               me.textMgs = e.response.data.data[0];
+              this.isShowAlert = false;
               me.$refs.popUpError.showForm();
             }
           });
@@ -393,13 +466,55 @@ export default {
             this.employee
           )
           .then(() => {
-            this.hideForm();
-            this.checkStatusForm = 0;
+            this.checkStatusForm = 1;
+            this.$refs.txtemployeecode.focus();
+            me.$emit("updateSuccessContinue");
+          })
+          .catch((e) => {
+            if (e.response.status == 400) {
+              me.textMgs = e.response.data.data[0];
+              this.isShowAlert = false;
+              me.$refs.popUpError.showForm();
+            }
+          });
+      }
+    },
+    /**
+     * Update employee và đóng form
+     * Author:(8/12/2021)
+     */
+    saveAndClose() {
+      const me = this;
+      if (this.checkStatusForm == 0) {
+        axios
+          .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
+          .then(() => {
+            this.isShow = false;
+            this.valueChanged = 0;
+            me.$emit("addSuccess");
+          })
+          .catch((e) => {
+            if (e.response.status == 400) {
+              me.textMgs = e.response.data.data[0];
+              this.isShowAlert = false;
+              me.$refs.popUpError.showForm();
+            }
+          });
+      } else {
+        axios
+          .put(
+            `${Resource.AMIS_SERVICE_URL}/Employees/` +
+              this.employee.employeeId,
+            this.employee
+          )
+          .then(() => {
+            this.isShow = false;
             me.$emit("updateSuccess");
           })
           .catch((e) => {
             if (e.response.status == 400) {
               me.textMgs = e.response.data.data[0];
+              this.isShowAlert = false;
               me.$refs.popUpError.showForm();
             }
           });
@@ -420,6 +535,20 @@ export default {
       return Common.ChangeGender(val);
     },
     /**
+     * Đóng form alert và form detail
+     */
+    clearForm() {
+      this.isShowAlert = !this.isShowAlert;
+      this.checkStatusForm = 0;
+      this.employee = {
+        employeeCode: "",
+        departmentName: "",
+        gender: "1",
+        employeeName: "Nguyễn Văn Chiến",
+      };
+      this.isShow = false;
+    },
+    /**
      * Lấy ra mã nhân viên mới
      * CreatedBy: NVChien(23/12/2021)
      */
@@ -434,8 +563,19 @@ export default {
           console.log(e);
         });
     },
+    /**
+     * Đóng form alert change value
+     * Author: NVChien(23/12/2021)
+     */
+    closeFormAlert() {
+      this.isShowAlert = !this.isShowAlert;
+    },
   },
   validations: {
+    /**
+     * Kiểm tra dữ liệu có để trống hay không
+     * Author: NVChien(23/12/2021)
+     */
     employee: {
       employeeCode: {
         required,
@@ -443,11 +583,24 @@ export default {
       employeeName: {
         required,
       },
+      email: {
+        email,
+      },
     },
   },
   components: {
     DropDown,
     PopUpError,
+    PopUpChangValue,
+  },
+  watch: {
+    // theo doi su thay doi cua form input
+    employee: {
+      handler: function () {
+        this.valueChanged += 1;
+      },
+      deep: true,
+    },
   },
 };
 </script>
