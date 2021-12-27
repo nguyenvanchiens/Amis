@@ -16,7 +16,7 @@
 
 body {
   margin: 0;
-  font-family: Notosans-Bold;
+  font-family: Notosans-Bold !important;
   font-size: 13px;
   box-sizing: border-box;
 }

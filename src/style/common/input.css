@@ -67,6 +67,10 @@ input::placeholder {
 input[type="date"] {
   height: 33px;
   width: 160px;
+  font-family: Notosans-Bold !important;
+  text-transform: uppercase;
+  font-weight: 200;
+  font-style: italic;
 }
 
 .m-input-card {

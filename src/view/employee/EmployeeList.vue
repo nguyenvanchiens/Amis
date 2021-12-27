@@ -31,6 +31,7 @@
             <input
               type="text"
               v-model="searchText"
+              @keyup.enter="FilterEmployee"
               class="m-input-search"
               placeholder="Tìm kiếm theo mã hoặc tên"
             />
@@ -165,8 +166,8 @@
 <script>
 import axios from "axios";
 import $ from "jquery";
-import Resource from "../../js/base/Resource";
-import { Common } from "../../js/base/Common";
+import Resource from "../../js/base/resource";
+import { Common } from "../../js/base/common";
 import EmployeeDetail from "./EmployeeDetail.vue";
 import Loading from "../../components/shared/Loading.vue";
 import ToastMessage from "../../components/shared/ToastMessage.vue";
@@ -184,11 +185,11 @@ export default {
     const me = this;
     me.$refs.popupEmployeeDetail.$on("updateSuccess", function () {
       me.refresh();
-      me.showToastMessage("Sửa thành công");
+      me.showToastMessage(Resource["VN"].Warning.textUpdateSuccess);
     });
     me.$refs.popupEmployeeDetail.$on("addSuccess", function () {
       me.refresh();
-      me.showToastMessage("Thêm mới thành công");
+      me.showToastMessage(Resource["VN"].Warning.textAddSuccess);
     });
     me.$refs.popupEmployeeDetail.$on("updateSuccessContinue", function () {
       me.$refs.loading.showLoading();
@@ -352,7 +353,9 @@ export default {
     showFomrDel() {
       const me = this;
       me.$refs.popUpDelete.showForm();
-      me.textMgs = `Bạn có muốn xóa nhân viên có mã <${me.employeeCode}> không?`;
+      me.textMgs =
+        Resource["VN"].Warning.textMgsDeleRecord +
+        ` <${this.employeeCode}> không?`;
       me.toogleMenu = !me.toogleMenu;
     },
     /**
@@ -368,36 +371,39 @@ export default {
      * Author: NvChien(12/10/2021)
      */
     Delete() {
-      if (this.selectedId.length > 0) {
-        axios
-          .post(
-            `${Resource.AMIS_SERVICE_URL}/Employees/DeleteMulti/`,
-            this.selectedId
-          )
-          .then(() => {
-            this.$refs.popUpDelete.hideForm();
-            this.selectedId = [];
-            this.showToastMessage();
-            this.toastText = "Xóa danh sách thành công thành công";
-            this.refresh();
-            this.toogleMenu = !this.toogleMenu;
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      } else {
-        axios
-          .delete(`${Resource.AMIS_SERVICE_URL}/Employees/` + this.EmployeeId)
-          .then(() => {
-            console.log("xóa thành công");
-            this.$refs.popUpDelete.hideForm();
-            this.showToastMessage();
-            this.toastText = "Xóa thành công";
-            this.refresh();
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+      try {
+        if (this.selectedId.length > 0) {
+          axios
+            .post(
+              `${Resource.AMIS_SERVICE_URL}/Employees/DeleteMulti/`,
+              this.selectedId
+            )
+            .then(() => {
+              this.$refs.popUpDelete.hideForm();
+              this.selectedId = [];
+              this.showToastMessage();
+              this.toastText = Resource["VN"].Warning.textDeleAllSuccess;
+              this.refresh();
+              this.toogleMenu = !this.toogleMenu;
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+        } else {
+          axios
+            .delete(`${Resource.AMIS_SERVICE_URL}/Employees/` + this.EmployeeId)
+            .then(() => {
+              this.$refs.popUpDelete.hideForm();
+              this.showToastMessage();
+              this.toastText = Resource["VN"].Warning.textDeleteSuccess;
+              this.refresh();
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     /**
@@ -407,8 +413,15 @@ export default {
     DelMutlRecord() {
       this.toggleDelMuti = !this.toggleDelMuti;
       this.toogleMenu = !this.toogleMenu;
-      this.textMgs = `Bạn có thực sự muốn danh danh sách nhân viên đã chọn?`;
+      this.textMgs = Resource["VN"].Warning.textMgsDeleAll;
       this.$refs.popUpDelete.showForm();
+    },
+    /**
+     * Tìm kiếm
+     * CreateBy: NVChien(23/12/2021)
+     */
+    FilterEmployee() {
+      this.loadData();
     },
     /**
      * Hiển thị toast message
@@ -440,15 +453,7 @@ export default {
       this.loadData();
     },
   },
-  watch: {
-    /**
-     * Tìm kiếm dữ liệu
-     * CreatedBy: NVChien (18/12/2021)
-     */
-    searchText: function () {
-      this.loadData();
-    },
-  },
+  watch: {},
   filters: {
     /**
      * Chuyển dữ liệu dateTime về dữ liệu đẹp

@@ -299,8 +299,8 @@ import DropDown from "../../components/shared/DropDown.vue";
 import PopUpError from "../../components/shared/PopUpError.vue";
 import PopUpChangValue from "../../components/shared/PopUpChangValue.vue";
 import axios from "axios";
-import Resource from "../../js/base/Resource";
-import { Common } from "../../js/base/Common";
+import Resource from "../../js/base/resource";
+import { Common } from "../../js/base/common";
 import { required, email } from "vuelidate/lib/validators";
 export default {
   props: {},
@@ -318,18 +318,6 @@ export default {
         employeeCode: "",
         employeeName: "Nguyễn Văn Chiến",
         departmentName: "",
-        gender: "1",
-        dateOfBirth: "2000-04-16",
-        identityNumber: "033200003877",
-        identityDate: "2015-05-17",
-        identityPlace: "Hưng Yên",
-        employeePosition: "Nhân viên",
-        address: "Hưng Yên",
-        telephoneNumber: "0987675432",
-        email: "chienymhy@gmail.com",
-        bankAccountNumber: "02547352",
-        bankName: "acb",
-        bankBranchName: "Hưng Yên",
       },
       isShowAlert: false,
       textMgs: "",
@@ -400,21 +388,9 @@ export default {
       } else {
         this.employee = {
           employeeCode: "",
-          employeeName: "Nguyễn Văn Chiến",
           departmentName: "",
-          gender: "1",
-          dateOfBirth: "2000-04-16",
-          identityNumber: "033200003877",
-          identityDate: "2015-05-17",
-          identityPlace: "Hưng Yên",
-          employeePosition: "Nhân viên",
-          email: "chienymhy@gmail.com",
-          telephoneNumber: "0987675432",
-          address: "Hưng Yên",
-          bankAccountNumber: "02547352",
-          bankName: "acb",
-          bankBranchName: "Hưng Yên",
         };
+        this.$refs.departmentDropDown.textSearch = "";
         this.newCodeEmployee();
       }
       setTimeout(() => {
@@ -427,46 +403,50 @@ export default {
      * Author:(8/12/2021)
      */
     saveAndContinue() {
-      const me = this;
-      if (this.checkStatusForm == 0) {
-        axios
-          .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
-          .then(() => {
-            this.checkStatusForm = 0;
-            this.newCodeEmployee();
-            this.employee = {
-              employeeCode: "",
-              departmentName: "",
-            };
-            this.$refs.txtemployeecode.focus();
-            me.$emit("addSuccessContinue");
-          })
-          .catch((e) => {
-            if (e.response.status == 400) {
-              me.textMgs = e.response.data.data[0];
-              this.isShowAlert = false;
-              me.$refs.popUpError.showForm();
-            }
-          });
-      } else {
-        axios
-          .put(
-            `${Resource.AMIS_SERVICE_URL}/Employees/` +
-              this.employee.employeeId,
-            this.employee
-          )
-          .then(() => {
-            this.checkStatusForm = 1;
-            this.$refs.txtemployeecode.focus();
-            me.$emit("updateSuccessContinue");
-          })
-          .catch((e) => {
-            if (e.response.status == 400) {
-              me.textMgs = e.response.data.data[0];
-              this.isShowAlert = false;
-              me.$refs.popUpError.showForm();
-            }
-          });
+      try {
+        const me = this;
+        if (this.checkStatusForm == 0) {
+          axios
+            .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
+            .then(() => {
+              this.checkStatusForm = 0;
+              this.newCodeEmployee();
+              this.employee = {
+                employeeCode: "",
+                departmentName: "",
+              };
+              this.$refs.txtemployeecode.focus();
+              me.$emit("addSuccessContinue");
+            })
+            .catch((e) => {
+              if (e.response.status == 400) {
+                me.textMgs = e.response.data.data[0];
+                this.isShowAlert = false;
+                me.$refs.popUpError.showForm();
+              }
+            });
+        } else {
+          axios
+            .put(
+              `${Resource.AMIS_SERVICE_URL}/Employees/` +
+                this.employee.employeeId,
+              this.employee
+            )
+            .then(() => {
+              this.checkStatusForm = 1;
+              this.$refs.txtemployeecode.focus();
+              me.$emit("updateSuccessContinue");
+            })
+            .catch((e) => {
+              if (e.response.status == 400) {
+                me.textMgs = e.response.data.data[0];
+                this.isShowAlert = false;
+                me.$refs.popUpError.showForm();
+              }
+            });
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     /**
@@ -474,40 +454,44 @@ export default {
      * Author:(8/12/2021)
      */
     saveAndClose() {
-      const me = this;
-      if (this.checkStatusForm == 0) {
-        axios
-          .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
-          .then(() => {
-            this.isShow = false;
-            this.valueChanged = 0;
-            me.$emit("addSuccess");
-          })
-          .catch((e) => {
-            if (e.response.status == 400) {
-              me.textMgs = e.response.data.data[0];
-              this.isShowAlert = false;
-              me.$refs.popUpError.showForm();
-            }
-          });
-      } else {
-        axios
-          .put(
-            `${Resource.AMIS_SERVICE_URL}/Employees/` +
-              this.employee.employeeId,
-            this.employee
-          )
-          .then(() => {
-            this.isShow = false;
-            me.$emit("updateSuccess");
-          })
-          .catch((e) => {
-            if (e.response.status == 400) {
-              me.textMgs = e.response.data.data[0];
-              this.isShowAlert = false;
-              me.$refs.popUpError.showForm();
-            }
-          });
+      try {
+        const me = this;
+        if (this.checkStatusForm == 0) {
+          axios
+            .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
+            .then(() => {
+              this.isShow = false;
+              this.valueChanged = 0;
+              me.$emit("addSuccess");
+            })
+            .catch((e) => {
+              if (e.response.status == 400) {
+                me.textMgs = e.response.data.data[0];
+                this.isShowAlert = false;
+                me.$refs.popUpError.showForm();
+              }
+            });
+        } else {
+          axios
+            .put(
+              `${Resource.AMIS_SERVICE_URL}/Employees/` +
+                this.employee.employeeId,
+              this.employee
+            )
+            .then(() => {
+              this.isShow = false;
+              me.$emit("updateSuccess");
+            })
+            .catch((e) => {
+              if (e.response.status == 400) {
+                me.textMgs = e.response.data.data[0];
+                this.isShowAlert = false;
+                me.$refs.popUpError.showForm();
+              }
+            });
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     /**
@@ -526,6 +510,7 @@ export default {
     },
     /**
      * Đóng form alert và form detail
+     * CreatedBy: NVChien(27/12/2021)
      */
     clearForm() {
       this.isShowAlert = !this.isShowAlert;
