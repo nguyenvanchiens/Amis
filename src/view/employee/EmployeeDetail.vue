@@ -68,10 +68,11 @@
               <div class="form-group">
                 <label for="">Đơn vị <span>*</span></label>
                 <DropDown
-                  :options="Department"
+                  :originalOptions="Department"
                   @select="selectOptionDepartment"
                   :departmentName="employee.departmentName"
                   :titleDepartmentNameIsNull="titleDepartmentNameIsNull"
+                  ref="departmentDropDown"
                 />
               </div>
             </div>
@@ -350,6 +351,7 @@ export default {
         .get(`${Resource.AMIS_SERVICE_URL}/Departments`)
         .then((res) => {
           this.Department = res.data;
+          this.$refs.departmentDropDown.options = [...res.data];
         })
         .catch((e) => {
           console.log(e);
@@ -434,21 +436,9 @@ export default {
             this.newCodeEmployee();
             this.employee = {
               employeeCode: "",
-              employeeName: "Nguyễn Văn Chiến",
               departmentName: "",
-              gender: "1",
-              dateOfBirth: "2000-04-16",
-              identityNumber: "033200003877",
-              identityDate: "2015-05-17",
-              identityPlace: "Hưng Yên",
-              employeePosition: "Nhân viên",
-              email: "chienymhy@gmail.com",
-              telephoneNumber: "0987675432",
-              address: "Hưng Yên",
-              bankAccountNumber: "02547352",
-              bankName: "acb",
-              bankBranchName: "Hưng Yên",
             };
+            this.$refs.txtemployeecode.focus();
             me.$emit("addSuccessContinue");
           })
           .catch((e) => {

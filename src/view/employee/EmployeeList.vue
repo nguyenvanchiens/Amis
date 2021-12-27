@@ -22,7 +22,7 @@
               class="item-text"
               style="font-size: 16px"
               @click="DelMutlRecord"
-              >xóa</span
+              >XÓA</span
             >
           </div>
         </div>
@@ -42,12 +42,11 @@
             </div>
           </button>
           <div>
-            <div
-              @click="exportExecl"
-              class="m-icon m-icon-export-excel icon-24"
-            >
-              <a href="https://localhost:44320/api/v1/Employees/Export">f</a>
-            </div>
+            <a
+              id="exportexcel"
+              href="https://localhost:44320/api/v1/Employees/Export"
+              ><div id="export" class="m-icon m-icon-export-excel icon-24"></div
+            ></a>
           </div>
         </div>
       </div>
@@ -410,13 +409,6 @@ export default {
       this.toogleMenu = !this.toogleMenu;
       this.textMgs = `Bạn có thực sự muốn danh danh sách nhân viên đã chọn?`;
       this.$refs.popUpDelete.showForm();
-    },
-    /**
-     * Xuất file execl cho bảng
-     * CreatedBy: NVChien(23/12/2021)
-     */
-    exportExecl() {
-      axios.get("https://localhost:44320/api/v1/Employees/Export");
     },
     /**
      * Hiển thị toast message

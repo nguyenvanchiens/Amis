@@ -12,19 +12,19 @@
       <div class="m-nav-item">
         <div class="m-nav-item-icon m-icon icon-24 m-icon-dashboard"></div>
         <div class="m-nav-item-text">
-          <router-link to="/">Dashboard</router-link>
+          <router-link to="/">Tổng quan</router-link>
         </div>
       </div>
       <div class="m-nav-item">
         <div class="m-nav-item-icon m-icon icon-24 m-icon-cash"></div>
         <div class="m-nav-item-text">
-          <router-link to="/employee">Employee</router-link>
+          <router-link to="/employee">Tiền mặt</router-link>
         </div>
       </div>
       <div class="m-nav-item">
         <div class="m-nav-item-icon m-icon icon-24 m-icon-bank"></div>
         <div class="m-nav-item-text">
-          <router-link to="/customer">Customer</router-link>
+          <router-link to="/customer">Tiền gửi</router-link>
         </div>
       </div>
       <div class="m-nav-item">

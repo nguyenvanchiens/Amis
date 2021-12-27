@@ -2,9 +2,10 @@
   <div class="scombobox">
     <input
       type="text"
-      id=""
       class="s-combobox-input"
       v-model="departmentName"
+      ref="txtFilter"
+      @keyup="filterData($event)"
       :class="{
         'm-input-error': $v.departmentName.$error,
       }"
@@ -30,13 +31,15 @@
 import { required } from "vuelidate/lib/validators";
 export default {
   props: {
-    options: Array,
+    originalOptions: Array,
     departmentName: String,
     titleDepartmentNameIsNull: String,
   },
   data() {
     return {
       isShow: false,
+      options: [],
+      textSearch: "",
     };
   },
   methods: {
@@ -46,6 +49,28 @@ export default {
      */
     showData() {
       this.isShow = !this.isShow;
+    },
+    /**
+     * Lọc dữ liệu data
+     * Created: NVChien(27/12/2021)
+     */
+    filterData(event) {
+      if (event.target.value) {
+        this.options = this.originalOptions;
+        this.options = this.options.filter(function (item) {
+          if (
+            item &&
+            item.departmentName &&
+            item.departmentName
+              .toLowerCase()
+              .includes(event.target.value.toLowerCase())
+          ) {
+            return true;
+          }
+          return false;
+        });
+      }
+      this.isShow = true;
     },
     /**
      * lấy ra dữ liệu và gọi lên cha
