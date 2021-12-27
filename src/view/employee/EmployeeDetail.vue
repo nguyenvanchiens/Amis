@@ -70,7 +70,6 @@
                 <DropDown
                   :originalOptions="Department"
                   @select="selectOptionDepartment"
-                  :departmentName="employee.departmentName"
                   :titleDepartmentNameIsNull="titleDepartmentNameIsNull"
                   ref="departmentDropDown"
                 />
@@ -396,6 +395,7 @@ export default {
         entity.dateOfBirth = this.ChangeDate(entity.dateOfBirth);
         entity.identityDate = this.ChangeDate(entity.identityDate);
         entity.gender = this.ChangeGender(entity.gender);
+        this.$refs.departmentDropDown.textSearch = entity.departmentName;
         this.employee = entity;
       } else {
         this.employee = {

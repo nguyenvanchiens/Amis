@@ -3,14 +3,14 @@
     <input
       type="text"
       class="s-combobox-input"
-      v-model="departmentName"
+      v-model="textSearch"
       ref="txtFilter"
       @keyup="filterData($event)"
       :class="{
-        'm-input-error': $v.departmentName.$error,
+        'm-input-error': $v.textSearch.$error,
       }"
-      @blur="$v.departmentName.$touch()"
-      :title="$v.departmentName.$error ? titleDepartmentNameIsNull : null"
+      @blur="$v.textSearch.$touch()"
+      :title="$v.textSearch.$error ? titleDepartmentNameIsNull : null"
     />
     <div @click="showData" class="s-combobox-buton">
       <i class="fas fa-sort-down"></i>
@@ -32,7 +32,6 @@ import { required } from "vuelidate/lib/validators";
 export default {
   props: {
     originalOptions: Array,
-    departmentName: String,
     titleDepartmentNameIsNull: String,
   },
   data() {
@@ -78,11 +77,12 @@ export default {
      */
     select(option) {
       this.isShow = !this.isShow;
+      this.textSearch = option.departmentName;
       this.$emit("select", option);
     },
   },
   validations: {
-    departmentName: {
+    textSearch: {
       required,
     },
   },

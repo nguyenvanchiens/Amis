@@ -20,7 +20,7 @@
           >
             <span
               class="item-text"
-              style="font-size: 16px"
+              style="font-size: 12px"
               @click="DelMutlRecord"
               >XÓA</span
             >
