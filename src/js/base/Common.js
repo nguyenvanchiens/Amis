@@ -9,10 +9,10 @@ export const Common = {
     var result = "";
     switch (val) {
       case "Male":
-        result = "Nữ";
+        result = "Nam";
         break;
       case "Female":
-        result = "Nam";
+        result = "Nữ";
         break;
       default:
         result = "Khác";
@@ -54,10 +54,10 @@ export const Common = {
       result = "2";
     }
     if (val == "Female") {
-      result = "1";
+      result = "0";
     }
     if (val == "Male") {
-      result = "0";
+      result = "1";
     }
     return result;
   },

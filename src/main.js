@@ -11,12 +11,12 @@ import Vuelidate from "vuelidate";
 
 const routes = [
   {
-    path: "/",
+    path: "/home",
     name: "Home",
     component: Home,
   },
   {
-    path: "/employee",
+    path: "/",
     name: "Employee",
     component: Employee,
   },

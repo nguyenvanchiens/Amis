@@ -1,6 +1,7 @@
 /*Code phần table*/
 .m-table {
-  height: 518px;
+  /* height: 518px; */
+  height: calc(100vh - 240px);
   overflow: scroll;
   scrollbar-width: thin;
 }

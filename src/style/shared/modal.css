@@ -17,10 +17,6 @@
   align-items: center;
   justify-content: space-between;
 }
-.m-dialog-title {
-  font-weight: bold;
-  font-weight: 600;
-}
 .input-group-lable {
   position: relative;
   top: 1px;
@@ -41,7 +37,10 @@
   font-size: 26px;
   color: rgb(121, 121, 121);
 }
-
+.m-btn-close-footer:focus,
+.m-btn-save-close:focus {
+  border: 1px solid rgb(77, 77, 77);
+}
 /**Form*/
 form {
   width: 865px;
@@ -51,6 +50,10 @@ form {
 }
 .form-info-left {
   margin-right: 15px;
+}
+
+.form-group-row input {
+  font-size: 13px;
 }
 .form-group-row {
   display: flex;
@@ -64,6 +67,7 @@ form {
 .form-group label {
   display: block;
   margin: 5px 0;
+  font-weight: 600;
 }
 .form-group .lbgender {
   position: relative;
@@ -105,6 +109,7 @@ form {
   border-top: 1px solid rgb(223, 223, 223);
   padding-top: 20px;
   padding-right: 30px;
+  direction: rtl;
 }
 /* DIALOG BACKGROUND */
 .dialog-background {

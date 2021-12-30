@@ -22,7 +22,7 @@
           <button class="m-btn-question">
             <i class="far fa-question-circle"></i>
           </button>
-          <button @click="hideForm" class="m-btn-close">
+          <button @click="hideFormClose" class="m-btn-close">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -39,8 +39,10 @@
                   class="m-input m-input-employeecode"
                   name=""
                   ref="txtemployeecode"
-                  :class="{ 'm-input-error': $v.employee.employeeCode.$error }"
-                  @blur="$v.employee.employeeCode.$touch()"
+                  :class="{
+                    'm-input-error':
+                      isSubmit && $v.employee.employeeCode.$error,
+                  }"
                   :title="
                     $v.employee.employeeCode.$error
                       ? titleEmployeeCodeIsNull
@@ -54,10 +56,13 @@
                   v-model="employee.employeeName"
                   type="text"
                   class="m-input m-input-fullname"
+                  ref="txtemployeename"
                   name=""
                   id="txtfullname"
-                  :class="{ 'm-input-error': $v.employee.employeeName.$error }"
-                  @blur="$v.employee.employeeName.$touch()"
+                  :class="{
+                    'm-input-error':
+                      isSubmit && $v.employee.employeeName.$error,
+                  }"
                   :title="
                     $v.employee.employeeName.$error ? titleEmployeeIsNull : null
                   "
@@ -69,8 +74,10 @@
                 <label for="">Đơn vị <span>*</span></label>
                 <DropDown
                   :originalOptions="Department"
+                  :isSubmit="isSubmit"
                   @select="selectOptionDepartment"
                   :titleDepartmentNameIsNull="titleDepartmentNameIsNull"
+                  :departmentName="employee.departmentName"
                   ref="departmentDropDown"
                 />
               </div>
@@ -113,7 +120,7 @@
                       name="gender"
                       id="rdgenderMale"
                     />
-                    <label for="">Nam</label>
+                    <label for="" class="lable-default">Nam</label>
                   </div>
                   <div class="group-radio-item">
                     <input
@@ -124,7 +131,7 @@
                       name="gender"
                       id="rdgenderMale"
                     />
-                    <label for="">Nữ</label>
+                    <label for="" class="lable-default">Nữ</label>
                   </div>
                   <div class="group-radio-item">
                     <input
@@ -135,14 +142,16 @@
                       name="gender"
                       id="rdgendercc"
                     />
-                    <label for="">Khác</label>
+                    <label for="" class="lable-default">Khác</label>
                   </div>
                 </div>
               </div>
             </div>
             <div class="form-group-row">
               <div class="form-group">
-                <label for="">Số chứng minh thư nhân dân</label>
+                <label for="" title="Số chứng minh thư nhân dân"
+                  >Số CMTND</label
+                >
                 <input
                   type="text"
                   v-model="employee.identityNumber"
@@ -191,7 +200,7 @@
           </div>
           <div class="form-group-row">
             <div class="form-group">
-              <label for="">Đt di động</label>
+              <label for="" title="Điện thoại di động">Đt di động</label>
               <input
                 type="text"
                 v-model="employee.phoneNumber"
@@ -201,7 +210,7 @@
               />
             </div>
             <div class="form-group">
-              <label for="">Đt cố định</label>
+              <label for="" title="Điện thoại cố định">Đt cố định</label>
               <input
                 type="text"
                 v-model="employee.telephoneNumber"
@@ -261,22 +270,26 @@
           <div>
             <button
               type="button"
-              @click="hideForm"
-              class="m-form-btn m-btn-close"
-            >
-              Hủy
-            </button>
-          </div>
-          <div>
-            <button type="button" @click="saveAndClose" class="m-form-btn">
-              Cất
-            </button>
-            <button
-              type="button"
               class="m-form-btn m-btn-save"
               @click="saveAndContinue"
             >
               Cất và Thêm
+            </button>
+            <button
+              type="button"
+              @click="saveAndClose"
+              class="m-form-btn m-btn-save-close"
+            >
+              Cất
+            </button>
+          </div>
+          <div>
+            <button
+              type="button"
+              @click="hideForm"
+              class="m-form-btn m-btn-close m-btn-close-footer"
+            >
+              Hủy
             </button>
           </div>
         </div>
@@ -314,11 +327,13 @@ export default {
       titleEmployeeIsNull: Resource["VN"].Warning.FullNameIsEmpty,
       titleEmployeeCodeIsNull: Resource["VN"].Warning.FullNameIsEmpty,
       titleDepartmentNameIsNull: Resource["VN"].Warning.DepartmentIsEmpty,
+      isSubmit: false,
       employee: {
         employeeCode: "",
-        employeeName: "Nguyễn Văn Chiến",
         departmentName: "",
+        gender: 1,
       },
+      FocusInput: false,
       isShowAlert: false,
       textMgs: "",
       checkStatusForm: 0,
@@ -334,15 +349,19 @@ export default {
      * Author: NVChien (9/12/2021)
      */
     loadDepartment() {
-      axios
-        .get(`${Resource.AMIS_SERVICE_URL}/Departments`)
-        .then((res) => {
-          this.Department = res.data;
-          this.$refs.departmentDropDown.options = [...res.data];
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      try {
+        axios
+          .get(`${Resource.AMIS_SERVICE_URL}/Departments`)
+          .then((res) => {
+            this.Department = res.data;
+            this.$refs.departmentDropDown.options = [...res.data];
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * Lấy ra value khi mà mình chọn cbb
@@ -356,40 +375,58 @@ export default {
      *Ẩn form
      * Author: NVChien(9/12/2021)
      */
-    hideForm() {
+    hideFormClose() {
+      this.isSubmit = false;
       if (this.valueChanged > 2) {
         this.isShowAlert = !this.isShowAlert;
       } else {
         this.checkStatusForm = 0;
-        this.employee = {
-          employeeCode: "",
-          departmentName: "",
-          gender: "1",
-          employeeName: "Nguyễn Văn Chiến",
-        };
+        this.employee = this.initNewEmployee();
         this.isShow = false;
       }
+    },
+    /**
+     * Ẩn form detail
+     * CreatedBy: NVChien(29/12/2021)
+     */
+    hideForm() {
+      this.checkStatusForm = 0;
+      this.employee = this.initNewEmployee();
+      this.isShow = false;
     },
     /**
      * Hiện from chi tiết hoặc thêm mới
      * CreateBY: NVChien(23/12/2021)
      */
-    showForm(entity) {
+    showForm(object) {
       this.valueChanged = 0;
       const me = this;
-      if (entity) {
+      if (object && object.data != null && !object.replication) {
+        console.log(object);
+        var entity = object.data;
         this.checkStatusForm = 1;
-        this.textSubmit = "Sửa";
         entity.dateOfBirth = this.ChangeDate(entity.dateOfBirth);
         entity.identityDate = this.ChangeDate(entity.identityDate);
         entity.gender = this.ChangeGender(entity.gender);
         this.$refs.departmentDropDown.textSearch = entity.departmentName;
         this.employee = entity;
+      } else if (object && object.data != null && object.replication) {
+        var entityReplication = object.data;
+        this.checkStatusForm = 0;
+        entityReplication.dateOfBirth = this.ChangeDate(
+          entityReplication.dateOfBirth
+        );
+        entityReplication.identityDate = this.ChangeDate(
+          entityReplication.identityDate
+        );
+        entityReplication.gender = this.ChangeGender(entityReplication.gender);
+        this.$refs.departmentDropDown.textSearch =
+          entityReplication.departmentName;
+        this.employee = entityReplication;
+        this.employee.employeeId == "";
+        this.newCodeEmployee();
       } else {
-        this.employee = {
-          employeeCode: "",
-          departmentName: "",
-        };
+        this.employee = this.initNewEmployee();
         this.$refs.departmentDropDown.textSearch = "";
         this.newCodeEmployee();
       }
@@ -404,17 +441,17 @@ export default {
      */
     saveAndContinue() {
       try {
+        this.$v.$touch();
+        this.isSubmit = true;
         const me = this;
         if (this.checkStatusForm == 0) {
           axios
             .post(`${Resource.AMIS_SERVICE_URL}/Employees/`, this.employee)
             .then(() => {
-              this.checkStatusForm = 0;
               this.newCodeEmployee();
-              this.employee = {
-                employeeCode: "",
-                departmentName: "",
-              };
+              this.isSubmit = false;
+              this.employee = this.initNewEmployee();
+              this.$refs.departmentDropDown.textSearch = "";
               this.$refs.txtemployeecode.focus();
               me.$emit("addSuccessContinue");
             })
@@ -433,9 +470,12 @@ export default {
               this.employee
             )
             .then(() => {
-              this.checkStatusForm = 1;
+              this.checkStatusForm = 0;
+              this.newCodeEmployee();
+              this.isSubmit = false;
+              this.employee = this.initNewEmployee();
+              this.$refs.departmentDropDown.textSearch = "";
               this.$refs.txtemployeecode.focus();
-              me.$emit("updateSuccessContinue");
             })
             .catch((e) => {
               if (e.response.status == 400) {
@@ -455,6 +495,8 @@ export default {
      */
     saveAndClose() {
       try {
+        this.$v.$touch();
+        this.isSubmit = true;
         const me = this;
         if (this.checkStatusForm == 0) {
           axios
@@ -462,6 +504,8 @@ export default {
             .then(() => {
               this.isShow = false;
               this.valueChanged = 0;
+              this.isShowAlert = false;
+              this.isSubmit = false;
               me.$emit("addSuccess");
             })
             .catch((e) => {
@@ -480,6 +524,9 @@ export default {
             )
             .then(() => {
               this.isShow = false;
+              this.isShowAlert = false;
+              this.checkStatusForm = 0;
+              this.isSubmit = false;
               me.$emit("updateSuccess");
             })
             .catch((e) => {
@@ -515,12 +562,7 @@ export default {
     clearForm() {
       this.isShowAlert = !this.isShowAlert;
       this.checkStatusForm = 0;
-      this.employee = {
-        employeeCode: "",
-        departmentName: "",
-        gender: "1",
-        employeeName: "Nguyễn Văn Chiến",
-      };
+      this.employee = this.initNewEmployee();
       this.isShow = false;
     },
     /**
@@ -545,6 +587,18 @@ export default {
     closeFormAlert() {
       this.isShowAlert = !this.isShowAlert;
     },
+    /**
+     * Khởi tạo dữ liệu nhân viên mới
+     * CreateBy: NVChien(30/12/2021)
+     */
+    initNewEmployee() {
+      let employee = {
+        employeeCode: "",
+        departmentName: "",
+        gender: 1,
+      };
+      return employee;
+    },
   },
   validations: {
     /**
@@ -560,6 +614,9 @@ export default {
       },
       email: {
         email,
+      },
+      departmentName: {
+        required,
       },
     },
   },
@@ -579,4 +636,8 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.lable-default {
+  font-weight: 500;
+}
+</style>

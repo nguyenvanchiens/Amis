@@ -10,10 +10,14 @@ button {
   border-radius: 2px;
   min-width: 70px;
 }
+
 .m-btn-save {
   margin-left: 5px;
   background-color: rgb(44, 159, 28);
   color: white;
+}
+.m-btn-save:focus {
+  border: 1px solid rgb(28, 29, 28);
 }
 .m-btn {
   height: 30px;
@@ -23,6 +27,9 @@ button {
   color: white;
   cursor: pointer;
   padding: 0 15px;
+}
+.btn-edit {
+  color: rgb(46, 123, 179);
 }
 .m-btn:hover {
   background-color: rgb(47, 190, 28);

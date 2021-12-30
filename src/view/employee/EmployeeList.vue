@@ -11,18 +11,18 @@
         <div class="m-content-multidel" @click="toggleDelMuti = !toggleDelMuti">
           <div class="m-content-multidel-text">Thực hiện hàng loạt</div>
           <div
-            :style="selectedId.length > 1 ? 'opacity:1' : ''"
+            :style="selectedId.length > 0 ? 'opacity:1' : ''"
             class="m-content-multidel-icon m-icon icon-16 mi-arrow-up--black"
           ></div>
           <div
             class="multidel-item"
-            v-show="toggleDelMuti && selectedId.length > 1"
+            v-show="toggleDelMuti && selectedId.length > 0"
           >
             <span
               class="item-text"
               style="font-size: 12px"
-              @click="DelMutlRecord"
-              >XÓA</span
+              @click="delMultiRecord"
+              >Xóa</span
             >
           </div>
         </div>
@@ -62,18 +62,16 @@
                   type="checkbox"
                 />
               </th>
-              <th class="text-align-left w150">Mã nhân viên</th>
+              <th class="text-align-left w100">Mã nhân viên</th>
               <th class="text-align-left w150">Tên nhân viên</th>
-              <th class="text-align-left w100">Giới tính</th>
+              <th class="text-align-left">Giới tính</th>
               <th class="m-text-center w100">Ngày sinh</th>
-              <th class="text-align-left w150">Số CMND</th>
+              <th class="text-align-left w100">Số CMND</th>
               <th class="text-align-left w100">Chức danh</th>
-              <th class="text-align-left" style="min-width: 200px">
-                Tên đơn vị
-              </th>
+              <th class="text-align-left w130">Tên đơn vị</th>
               <th class="text-align-left w150">Số tài khoản</th>
               <th class="text-align-left w100">Tên ngân hàng</th>
-              <th class="text-align-left w200">Chi nhánh TK ngân hàng</th>
+              <th class="text-align-left w150">Chi nhánh TK ngân hàng</th>
               <th class="text-align-right" style="padding-right: 12px">
                 Chức năng
               </th>
@@ -96,7 +94,9 @@
                 />
               </td>
               <td>{{ employee.employeeCode }}</td>
-              <td>{{ employee.employeeName }}</td>
+              <td :title="employee.employeeName">
+                {{ employee.employeeName }}
+              </td>
               <td>{{ employee.genderName }}</td>
               <td class="m-text-center">
                 {{ employee.dateOfBirth | formatDate }}
@@ -108,7 +108,9 @@
               <td>{{ employee.bankName }}</td>
               <td>{{ employee.bankBranchName }}</td>
               <td>
-                <button @click="showFormDetail(employee)">Sửa</button>
+                <button @click="showFormDetail(employee)" class="btn-edit">
+                  Sửa
+                </button>
                 <button
                   @click="showListRowTable($event, employee)"
                   class="m-btn-icon down-data-row"
@@ -149,7 +151,7 @@
     </div>
     <!-- CONTEXT MENU -->
     <div id="contextMenu" v-show="toogleMenu">
-      <button id="duplicate">Nhân bản</button>
+      <button id="duplicate" @click="replicationEmployee">Nhân bản</button>
       <button id="delete" v-on:click="showFomrDel">Xóa</button>
       <button id="stopUsing">Ngừng sử dụng</button>
     </div>
@@ -185,11 +187,11 @@ export default {
     const me = this;
     me.$refs.popupEmployeeDetail.$on("updateSuccess", function () {
       me.refresh();
-      me.showToastMessage(Resource["VN"].Warning.textUpdateSuccess);
+      me.showToastMessage(Resource["VN"].ToastMessage.textUpdateSuccess);
     });
     me.$refs.popupEmployeeDetail.$on("addSuccess", function () {
       me.refresh();
-      me.showToastMessage(Resource["VN"].Warning.textAddSuccess);
+      me.showToastMessage(Resource["VN"].ToastMessage.textAddSuccess);
     });
     me.$refs.popupEmployeeDetail.$on("updateSuccessContinue", function () {
       me.$refs.loading.showLoading();
@@ -225,6 +227,7 @@ export default {
       toastText: "",
       TotalRecord: 0,
       searchText: "",
+      resource: Resource,
       // số bản ghi trên một trang
       pageSize: 10,
       // trang hiện tại
@@ -296,7 +299,7 @@ export default {
       axios
         .get(`${Resource.AMIS_SERVICE_URL}/Employees/` + employee.employeeId)
         .then((response) => {
-          me.$refs.popupEmployeeDetail.showForm(response.data);
+          me.$refs.popupEmployeeDetail.showForm(response);
         })
         .catch((e) => {
           this.errors.push(e);
@@ -353,9 +356,7 @@ export default {
     showFomrDel() {
       const me = this;
       me.$refs.popUpDelete.showForm();
-      me.textMgs =
-        Resource["VN"].Warning.textMgsDeleRecord +
-        ` <${this.employeeCode}> không?`;
+      me.textMgs = Resource["VN"].DeleteConfirm(this.employeeCode);
       me.toogleMenu = !me.toogleMenu;
     },
     /**
@@ -367,24 +368,45 @@ export default {
       this.popUpDelete = !this.isShowFormDel;
     },
     /**
+     * Nhân bản nhân viên từ dữ liệu có sẵn
+     * CreatedBy:NVChien(30/12/2021)
+     */
+    replicationEmployee() {
+      try {
+        const me = this;
+        this.toogleMenu = false;
+        axios
+          .get(`${Resource.AMIS_SERVICE_URL}/Employees/` + me.EmployeeId)
+          .then((response) => {
+            response.replication = true;
+            me.$refs.popupEmployeeDetail.showForm(response);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
      * Xóa nhân viên hoặc xóa nhiều bản ghi
      * Author: NvChien(12/10/2021)
      */
     Delete() {
       try {
+        this.toogleMenu = false;
         if (this.selectedId.length > 0) {
           axios
             .post(
-              `${Resource.AMIS_SERVICE_URL}/Employees/DeleteMulti/`,
+              `${Resource.AMIS_SERVICE_URL}/Employees/DeleteMultiEntity/`,
               this.selectedId
             )
             .then(() => {
               this.$refs.popUpDelete.hideForm();
               this.selectedId = [];
               this.showToastMessage();
-              this.toastText = Resource["VN"].Warning.textDeleAllSuccess;
+              this.toastText = Resource["VN"].ToastMessage.textDeleAllSuccess;
               this.refresh();
-              this.toogleMenu = !this.toogleMenu;
             })
             .catch((e) => {
               console.log(e);
@@ -395,7 +417,7 @@ export default {
             .then(() => {
               this.$refs.popUpDelete.hideForm();
               this.showToastMessage();
-              this.toastText = Resource["VN"].Warning.textDeleteSuccess;
+              this.toastText = Resource["VN"].ToastMessage.textDeleteSuccess;
               this.refresh();
             })
             .catch((e) => {
@@ -410,11 +432,10 @@ export default {
      * Xóa nhiều bản ghi
      * CreateBy: NVChien(23/12/2021)
      */
-    DelMutlRecord() {
-      this.toggleDelMuti = !this.toggleDelMuti;
-      this.toogleMenu = !this.toogleMenu;
-      this.textMgs = Resource["VN"].Warning.textMgsDeleAll;
+    delMultiRecord() {
       this.$refs.popUpDelete.showForm();
+      this.toggleDelMuti = false;
+      this.textMgs = Resource["VN"].DeleteAllConfirm();
     },
     /**
      * Tìm kiếm
@@ -453,7 +474,13 @@ export default {
       this.loadData();
     },
   },
-  watch: {},
+  watch: {
+    searchText: function () {
+      setTimeout(() => {
+        this.loadData();
+      }, 1000);
+    },
+  },
   filters: {
     /**
      * Chuyển dữ liệu dateTime về dữ liệu đẹp

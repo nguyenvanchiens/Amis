@@ -7,11 +7,6 @@ import Student from "./view/stuent/StudentList";
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
-  },
-  {
-    path: "/employee",
     name: "Employee",
     component: Employee,
   },

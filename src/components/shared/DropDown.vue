@@ -7,7 +7,7 @@
       ref="txtFilter"
       @keyup="filterData($event)"
       :class="{
-        'm-input-error': $v.textSearch.$error,
+        'm-input-error': isSubmit && $v.textSearch.$error,
       }"
       @blur="$v.textSearch.$touch()"
       :title="$v.textSearch.$error ? titleDepartmentNameIsNull : null"
@@ -33,6 +33,7 @@ export default {
   props: {
     originalOptions: Array,
     titleDepartmentNameIsNull: String,
+    isSubmit: Boolean,
   },
   data() {
     return {
@@ -47,6 +48,7 @@ export default {
      * Author: NVChien (9/12/2021)
      */
     showData() {
+      this.options = this.originalOptions;
       this.isShow = !this.isShow;
     },
     /**
@@ -68,6 +70,8 @@ export default {
           }
           return false;
         });
+      } else {
+        this.options = this.originalOptions;
       }
       this.isShow = true;
     },
